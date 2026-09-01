@@ -1,0 +1,297 @@
+% ============================================================================
+% Homework 1 -- covers Weeks 1-3 (optimization language, convexity, LP vs IP,
+% rewriting dictionary, epigraph trick, binary-variable toolbox).
+% Self-contained on purpose -- no \input{preamble} -- compiles with pdflatex.
+% ============================================================================
+\documentclass[10pt]{article}
+
+\usepackage[a4paper, margin=2.2cm]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+
+\definecolor{ruleink}{RGB}{18, 68, 140}
+\definecolor{keyink}{RGB}{20, 90, 20}
+
+\setlength{\parindent}{0pt}
+\pagestyle{plain}
+
+\AtBeginDocument{%
+  \abovedisplayskip=5pt plus 1pt
+  \belowdisplayskip=5pt plus 1pt
+  \abovedisplayshortskip=3pt
+  \belowdisplayshortskip=3pt}
+
+% ---- one problem -----------------------------------------------------------
+\newcommand{\problem}[2]{%   points, title
+  \par\bigskip
+  {\color{ruleink}\rule{\textwidth}{1pt}}\par\nobreak\vspace{3pt}
+  {\large\bfseries #2}\hfill{\normalsize\bfseries(#1 points)}\par\nobreak\vspace{4pt}}
+
+\newlist{parts}{enumerate}{1}
+\setlist[parts]{label=(\alph*), leftmargin=2.2em, itemsep=3pt}
+
+\begin{document}
+
+\begin{center}
+  {\large OL7014 Integer Programming}\\[3pt]
+  {\Large\bfseries Homework 1}\\[4pt]
+  {\small \textbf{Due Sep 15, start of class}}
+\end{center}
+\medskip\hrule\medskip
+
+Write down your solutions and submit them as a single PDF to
+\texttt{lossof0706@gmail.com}.\\
+Problem 6 is an optional bonus (20 points).
+
+% ================================================================ Problem 1
+\problem{20}{Problem 1. Reading and writing the language}
+
+A transport aircraft is being loaded for a resupply flight. Three cargo types:
+
+\begin{center}
+\begin{tabular}{l|ccc}
+              & water pallet & fuel drum & medical pallet \\ \hline
+ value (pts)  & 5 & 4 & 7 \\
+ weight (t)   & 2 & 3 & 1 \\
+ volume (m$^3$) & 3 & 1 & 2 \\
+\end{tabular}
+\end{center}
+
+The aircraft carries at most $60$ t and $55$ m$^3$. Orders require that \emph{exactly}
+$4$ medical pallets fly. For this problem cargo is divisible --- fractional pallets may
+be manifested. The goal is to maximize total value.
+
+\begin{parts}
+\item \textbf{(6 pts)} Define the decision variables and write the problem as a scalar
+  LP: objective plus constraints, one line each, with a few words saying what each
+  constraint enforces.
+\item \textbf{(8 pts)} Put your LP in the standard form
+  $\max\, c^{\top}x$ s.t.\ $Ax \le b$ from Week 1. Write out $c$, $A$, $b$ with
+  numbers in them. Remember the dictionary: an equality becomes \emph{two} inequality
+  rows, and nonnegativity gets its own rows. Report the dimensions of $A$.
+\item \textbf{(3 pts)} Is the feasible set a polyhedron? Is the problem convex?
+  One sentence each.
+\item \textbf{(3 pts)} Orders change: only \emph{whole} pallets and drums may fly
+  ($x \in \mathbb{Z}^3$). Which of your answers in (c) change, and to what?
+\end{parts}
+
+% ================================================================ Problem 2
+\problem{20}{Problem 2. Convexity, by pictures}
+
+No formal proofs in this problem. All you need is the \emph{segment test} from
+lecture --- a set is convex when the straight segment between any two of its points
+stays inside --- plus a pencil and a ruler. Label your drawings.
+
+\begin{parts}
+\item \textbf{(7 pts)} Draw two convex sets in $\mathbb{R}^2$ whose \emph{union} is
+  not convex: mark two points of the union and the point on their segment that
+  escapes it. Then \emph{try} to draw two convex sets whose \emph{intersection} is
+  not convex. After a few honest attempts, state in one sentence what you believe
+  to be true about intersections --- no proof needed, just your pictures.
+\item \textbf{(7 pts)} Draw the Week 1 toy
+  $P = \{\, (x,y) \ge 0 \;:\; x + 3y \le 10, \ 3x + y \le 10 \,\}$ and mark all the
+  lattice points $X = P \cap \mathbb{Z}^2$. Now run the segment test on $X$: pick
+  two points of $X$ whose segment passes through a point that is not in $X$, and
+  label that escaping point with its coordinates. What did the single line
+  ``$\in \mathbb{Z}$'' do to convexity?
+\item \textbf{(6 pts)} Same picture, one question: for a max problem, why can the
+  LP relaxation's optimal value $z_{\mathrm{LP}}$ never be \emph{smaller} than the
+  IP's $z_{\mathrm{IP}}$? Answer in one or two sentences, no notation needed.
+  (Lecture's hint: deleting the ``$\in \mathbb{Z}$'' line only \emph{enlarges} the
+  set of allowed plans.)
+\end{parts}
+
+% ================================================================ Problem 3
+\problem{20}{Problem 3. Relax, round, regret}
+
+A patrol packs a rucksack that carries $W = 24$ kg. Ammo boxes weigh $5$ kg and are
+worth $8$ points each; med kits weigh $7$ kg and are worth $11$ points each. Any
+nonnegative integer count of each may be packed:
+\[
+\begin{aligned}
+  \max\quad & 8x + 11y \\
+  \text{s.t.}\quad & 5x + 7y \le 24 \\
+                   & x, y \in \mathbb{Z}_{+}
+\end{aligned}
+\]
+
+\begin{parts}
+\item \textbf{(5 pts)} Solve the LP relaxation graphically: draw the feasible region,
+  list every vertex with its objective value, and report the LP optimum
+  $(x^{\star}, y^{\star})$ and $z_{\mathrm{LP}}$.
+\item \textbf{(5 pts)} Round the LP optimum: list \emph{every} candidate obtained by
+  taking $\lfloor\cdot\rfloor$ or $\lceil\cdot\rceil$ in each coordinate, check each
+  for feasibility in a table (as in lecture), and report the best \emph{feasible}
+  rounded value.
+\item \textbf{(5 pts)} Find the true IP optimum by enumeration. First justify why
+  $x \le 4$ and $y \le 3$ bound the search, then report the optimum and its value.
+\item \textbf{(2 pts)} Verify the chain
+  $z_{\mathrm{LP}} \;\ge\; z_{\mathrm{IP}} \;>\; \text{best rounding}$
+  with your numbers, and say in one sentence what rounding lost.
+\item \textbf{(3 pts)} Implement the IP with \texttt{gurobipy} and solve it. Include
+  a screenshot of your code and its printed output, using exactly this form:
+\begin{verbatim}
+print(f"optimal solution x is {x.X}")
+print(f"optimal solution y is {y.X}")
+print(f"optimal objective value is {model.ObjVal}")
+\end{verbatim}
+  Check that Gurobi agrees with your answer in (c).
+\end{parts}
+
+% ================================================================ Problem 4
+\problem{20}{Problem 4. The rewriting dictionary}
+
+\begin{parts}
+\item \textbf{(10 pts)} Convert the following problem to the standard form
+  $\max\, \tilde c^{\top}\tilde x$ s.t.\ $\tilde A \tilde x \le \tilde b$:
+  \[
+  \begin{aligned}
+    \min\quad & 2x_1 - x_2 + 3x_3 \\
+    \text{s.t.}\quad & x_1 + x_2 \ge 4 \\
+                     & 2x_1 - x_3 = 5 \\
+                     & x_2 + x_3 \le 6 \\
+                     & x_1 \ge 0, \quad x_3 \ge 0, \quad x_2 \ \text{free}
+  \end{aligned}
+  \]
+  List the new variable vector $\tilde x$, write out $\tilde c$, $\tilde A$,
+  $\tilde b$ with numbers, report the dimensions of $\tilde A$, and state how the
+  optimal value of the rewritten problem relates to the original one.
+  \emph{Follow-up:} if $x_2$ were declared integer, which of your new variables must
+  be declared integer --- and show by example why declaring only one of them integer
+  is wrong.
+\item \textbf{(10 pts)} Ten escort vehicles must be split across two convoy routes:
+  $x_1 + x_2 = 10$, $x \ge 0$. The mission's exposure is the \emph{worst} of three
+  segment scores, each decreasing in the escorts assigned:
+  \[
+    s_1 = 40 - 3x_1 - x_2, \qquad
+    s_2 = 38 - x_1 - 4x_2, \qquad
+    s_3 = 36 - 2x_1 - 2x_2 .
+  \]
+  Command wants to minimize the worst exposure:
+  $\min_{x} \max\{s_1, s_2, s_3\}$.
+  \begin{enumerate}[label=(\roman*), leftmargin=2.2em, itemsep=2pt]
+    \item \textbf{(5 pts)} Reformulate as an LP using the epigraph trick. Write out
+      the full LP.
+    \item \textbf{(2 pts)} In one sentence: why does the optimal $t$ equal the
+      largest $s_i$ at the optimum, rather than sitting strictly above it?
+    \item \textbf{(3 pts)} A teammate tries the same trick on
+      $\min_x \min_i \{s_i(x)\}$ by writing $s_i(x) \ge t \ \forall i$ and
+      maximizing $t$. Explain why this does not model the problem, and name the
+      Week 2--3 tool that models ``the best of several cases'' correctly.
+  \end{enumerate}
+\end{parts}
+
+% ================================================================ Problem 5
+\problem{20}{Problem 5. Switches}
+
+Four candidate sites for forward supply depots must together ship $100$ t to the
+front. Opening site $i$ costs $c_i$; an open site ships $y_i \ge 0$ tons at $f_i$
+per ton, up to its capacity $u_i$; a closed site ships nothing.
+
+\begin{center}
+\begin{tabular}{l|cccc}
+ site $i$            & 1 (island) & 2 (port) & 3 (north road) & 4 (south road) \\ \hline
+ fixed cost $c_i$ (\$k)      & 18  & 12  & 16  & 14 \\
+ capacity $u_i$ (t)          & 80  & 50  & 70  & 40 \\
+ per-ton cost $f_i$ (\$k/t)  & 0.2 & 0.5 & 0.3 & 0.25 \\
+\end{tabular}
+\end{center}
+
+\begin{parts}
+\item \textbf{(6 pts)} Write the base MILP: binaries $x_i$ for opening, continuous
+  $y_i$ for shipping, objective, demand constraint, and one \emph{linking constraint}
+  per site. Why is $u_i$ the smallest certainly-valid big-$M$ in site $i$'s linking
+  row?
+\item \textbf{(6 pts)} Add each field rule as one or two linear constraints, and
+  check each by trying the $0/1$ cases:
+  \begin{enumerate}[label=(\roman*), leftmargin=2.2em, itemsep=2pt]
+    \item site 1 is on an island supplied through the port --- if site 1 opens,
+      site 2 must open;
+    \item sites 3 and 4 share one mountain road --- at most one of them may open;
+    \item command requires at least two open sites.
+  \end{enumerate}
+\item \textbf{(3 pts)} A new rule arrives: if \emph{any single site} ships more than
+  $60$ t, an inspector must be hired for a flat $\$5$k. Model this with one new
+  binary $z$ and one constraint per site. Give the smallest certainly-valid $M$ for
+  each of the four rows --- and point out which rows turn out to be vacuous, and why.
+\item \textbf{(2 pts)} Two sentences on big-$M$ in this model: what silently goes
+  wrong if site 1's linking $M$ is $50$, and what goes wrong (differently) if it is
+  $10^6$?
+\item \textbf{(3 pts)} Solve the full model (a)--(c) with \texttt{gurobipy} in
+  Colab. Report which sites open, the shipments $y$, whether the
+  inspector is hired, and the total cost. Then delete the inspector rule, re-solve,
+  and report what changes.
+\end{parts}
+
+% ================================================================ Problem 6 (bonus)
+\problem{+20 bonus}{Problem 6. Standard form, without understanding}
+
+The model below is the \emph{deterministic location--allocation problem} (LAP); it
+returns in Weeks 5 and 9--10. You are \textbf{not} expected to understand the
+problem --- just apply the Week 2 dictionary.
+
+\medskip
+Sites $i \in \{1,2,3\}$; directed arcs
+$a_1 = (1\!\to\!2)$, $a_2 = (2\!\to\!1)$, $a_3 = (2\!\to\!3)$, $a_4 = (3\!\to\!2)$.
+Decisions: open $x_i \in \{0,1\}$, reserve $r_i \ge 0$, flow $w_a \ge 0$, shortage
+$q_i \ge 0$, surplus $s_i \ge 0$.
+\[
+\begin{aligned}
+  \min_{x,\,r,\,w,\,q,\,s}\quad
+    & \textstyle\sum_i c_i x_i + \sum_i f_i r_i + \sum_a t_a w_a
+      + \pi \sum_i q_i + \sigma \sum_i s_i \\
+  \text{s.t.}\quad
+    & \textstyle\sum_i r_i \le B
+      && \text{(budget)} \\
+    & r_i \le B\, x_i \quad \forall i
+      && \text{(linking)} \\
+    & \textstyle\sum_i x_i \le p
+      && \text{(cardinality)} \\
+    & \textstyle\sum_{a \text{ into } i} w_a \;-\; \sum_{a \text{ out of } i} w_a
+      \;+\; q_i - s_i + r_i \;=\; \bar\zeta_i \quad \forall i
+      && \text{(balance)} \\
+    & 0 \le w_a \le w^{\max} \ \forall a, \qquad
+      0 \le q_i \le \bar\zeta_i \ \forall i, \qquad
+      r, s \ge 0, \qquad x_i \in \{0,1\} \ \forall i
+\end{aligned}
+\]
+\begin{center}
+\begin{tabular}{l|ccc@{\qquad}l|cccc}
+ site $i$          & 1 & 2 & 3 & arc $a$ & $a_1$ & $a_2$ & $a_3$ & $a_4$ \\ \cline{1-4}\cline{5-9}
+ open cost $c_i$   & 100 & 80 & 120 & transport $t_a$ & 4 & 4 & 6 & 6 \\
+ reserve cost $f_i$ & 2 & 1 & 3 & & & & & \\
+ mean demand $\bar\zeta_i$ & 12 & 8 & 15 & & & & & \\
+\end{tabular}\\[3pt]
+$\pi = 60$ (shortage), \quad $\sigma = 1$ (surplus), \quad $B = 40$, \quad $p = 2$,
+\quad $w^{\max} = 90$
+\end{center}
+
+Reduce everything to the course's canonical MILP form (Week 2, Section 1):
+\[
+  \max\; c^{\top}x + h^{\top}y
+  \quad \text{s.t.} \quad Ax + Gy \le b,
+  \quad x \in \mathbb{Z}^{3}_{+}, \ \ y \ge 0
+\]
+--- remember the semester convention: $x$ = integer decisions, $y$ = continuous.
+
+\begin{parts}
+\item \textbf{(4 pts)} Which decisions form the integer block $x$, and which the
+  continuous block $y$? Write $y$ as a stacked vector in the order $(r, w, q, s)$,
+  report the dimensions of $x$ and $y$, and give the dictionary line that turns
+  each $x_i \in \{0,1\}$ into the form above.
+\item \textbf{(5 pts)} Write $c$ and $h$ in full, with numbers. (Careful: the model
+  is a min.)
+\item \textbf{(9 pts)} Describe $A$, $G$, $b$ as labeled blocks with their
+  dimensions (budget, linking, cardinality, balance, bounds). Then write out, in
+  full numbers --- each row of $A$ together with its row of $G$ --- these rows
+  only: the budget row, the three linking rows, the cardinality row, and the
+  \emph{two} rows that encode site 2's balance equality.
+\item \textbf{(2 pts)} Report the final dimensions of $A$ and $G$, counting every
+  row your conversion produced. (Nonnegativity rows are free here ---
+  $x \in \mathbb{Z}^{3}_{+}$ and $y \ge 0$ are part of the form.)
+\end{parts}
+
+\end{document}
