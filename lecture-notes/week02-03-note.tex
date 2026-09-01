@@ -1,0 +1,489 @@
+% ============================================================================
+% Week 2-3 -- LECTURE NOTE (student-facing)
+%
+% Remainder of week 1 (IPs, relax-and-round, knapsack) + the week-2
+% binary-variable toolbox. Style of week01-note.tex, condensed to board
+% fragments. Self-contained -- no \input{preamble}.
+% ============================================================================
+\documentclass[10pt]{article}
+
+\usepackage[a4paper, margin=1.5cm]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{tikz}
+\usepackage[hidelinks]{hyperref}
+
+\definecolor{ruleink}{RGB}{18, 68, 140}
+\definecolor{demoink}{RGB}{140, 82, 20}
+\definecolor{keyink}{RGB}{20, 90, 20}
+\definecolor{watchink}{RGB}{86, 60, 140}
+\definecolor{punchink}{RGB}{170, 30, 60}
+
+\setlength{\parindent}{0pt}
+\pagestyle{empty}
+
+% tighter spacing around centered displays
+\AtBeginDocument{%
+  \abovedisplayskip=4pt plus 1pt
+  \belowdisplayskip=4pt plus 1pt
+  \abovedisplayshortskip=2pt
+  \belowdisplayshortskip=2pt}
+
+% ---- one section -----------------------------------------------------------
+\newcommand{\beat}[2]{%   number, title
+  \par\medskip
+  {\color{ruleink}\rule{\textwidth}{1pt}}\par\nobreak\vspace{2pt}
+  {\large\bfseries #1.\; #2}\par\nobreak\vspace{3pt}}
+
+% ---- board content ---------------------------------------------------------
+\newenvironment{board}{%
+  \par\vspace{2pt}
+  \begingroup\leftskip=1.3em\relax}{%
+  \par\endgroup\vspace{2pt}}
+
+% ---- highlights ------------------------------------------------------------
+\newcommand{\demo}[2]{\par{\color{demoink}\small\textbf{demo}\quad\texttt{#1} --- #2}\par}
+\newcommand{\watch}[1]{\par{\color{watchink}\small\textbf{watch}\quad #1}\par}
+\newcommand{\key}[1]{\par\vspace{1pt}{\color{keyink}\small\textbf{KEY}\quad\textbf{#1}}\par}
+\newcommand{\takeaway}[1]{%
+  \par\vspace{2pt}\noindent
+  {\color{punchink}\rule{2pt}{10pt}}\;{\color{punchink}\small\textbf{takeaway}\quad\textbf{#1}}\par\vspace{2pt}}
+
+\begin{document}
+
+{\Large\bfseries Week 2--3 --- Integer Programs and the Binary-Variable Toolbox}\\[2pt]
+{\small OL7014 Integer Programming \quad\textbullet\quad Instructor: Prof.\ H.\ Park \quad\textbullet\quad Weeks of Aug 31 \& Sep 7, 2026}
+
+% ---------------------------------------------------------------- 1
+\beat{1}{Integer Programming (IP): add integrality --- and lose convexity}
+\begin{board}
+one new line on last week's LP: \qquad $x, y \in \mathbb{Z}$
+\[
+  X \;=\; P \cap \mathbb{Z}^n
+  \qquad\quad P = \{\, x : Ax \le b \,\} = \text{linear container (last week's polyhedron)}, \quad X = \text{lattice points inside}
+\]
+\emph{read the symbols:} \quad $\mathbb{Z}$ = the integers, \quad $\cap$ = intersection (points in \emph{both} sets)
+\vspace{3pt}
+
+\textbf{pure IP}:
+\[
+\begin{aligned}
+  \max_{x}\quad & c^{\top}x \\
+  \text{s.t.}\quad & Ax \le b \\
+                   & x \in \mathbb{Z}^n
+\end{aligned}
+\]
+\textbf{binary program (BP)} --- every decision a yes/no switch:
+\[
+\begin{aligned}
+  \max_{x}\quad & c^{\top}x \\
+  \text{s.t.}\quad & Ax \le b \\
+                   & x \in \{0,1\}^n \quad (\text{or } x \in \mathbb{B}^n)
+\end{aligned}
+\]
+\quad $x_j \in \{0,1\}$ or $x_j \in \mathbb{B}$; \quad
+$x_j \in \{0,1\} \iff x_j \in \mathbb{Z}, \ 0 \le x_j \le 1$ \quad --- a BP is an IP with $0/1$ bounds
+\vspace{4pt}
+
+\textbf{mixed-integer LP (MILP)} --- integer $x$ and continuous $y$ mixed:
+\[
+\begin{aligned}
+  \max_{x,\,y}\quad & c^{\top}x + h^{\top}y \\
+  \text{s.t.}\quad & Ax + Gy \le b \\
+                   & x \in \mathbb{Z}^n_{+}, \quad y \ge 0
+\end{aligned}
+\]
+\vspace{1pt}
+
+\quad \emph{example:} \ last week's toy with crates integer ($x_1$ = ammo, $x_2$ = rations),
+plus fuel $y$ (liters --- divisible):
+\[
+\begin{aligned}
+  \max\quad & 4x_1 + 5x_2 + 2y \\
+  \text{s.t.}\quad & x_1 + 3x_2 + y \le 10 \\
+                   & 3x_1 + x_2 + 2y \le 10 \\
+                   & x \in \mathbb{Z}^2_{+}, \quad y \ge 0
+\end{aligned}
+\]
+\quad $(c, A, b)$ we already know --- the \emph{only} new pieces are $h$ and $G$:
+\[
+  c = \begin{pmatrix} 4 \\ 5 \end{pmatrix}, \qquad
+  A = \begin{pmatrix} 1 & 3 \\ 3 & 1 \\ -1 & 0 \\ 0 & -1 \end{pmatrix}, \qquad
+  h = \begin{pmatrix} 2 \end{pmatrix}, \qquad
+  G = \begin{pmatrix} 1 \\ 2 \\ 0 \\ 0 \end{pmatrix}, \qquad
+  b = \begin{pmatrix} 10 \\ 10 \\ 0 \\ 0 \end{pmatrix}
+\]
+\quad (rows 3--4 are $x \ge 0$, exactly as last week; $y \ge 0$ comes with the form)
+\vspace{3pt}
+
+\textbf{$X$ is \emph{not} convex} --- midpoint of two lattice points need not be one
+\end{board}
+\key{convention: $x$ integer decisions, $y$ continuous.}
+\begin{center}
+\begin{tikzpicture}[scale=0.56, font=\tiny]
+  \fill[blue!10] (0,0) -- (10/3,0) -- (2.5,2.5) -- (0,10/3) -- cycle;
+  \draw[thin,gray] (0,0) -- (10/3,0) -- (2.5,2.5) -- (0,10/3) -- cycle;
+  \draw[->] (0,0) -- (3.9,0) node[below] {$x$}; \draw[->] (0,0) -- (0,3.9) node[left] {$y$};
+  \draw[very thick, blue!65!black] (0.4,2.6) -- (2.9,0.5);
+  \fill (0.4,2.6) circle (2pt); \fill (2.9,0.5) circle (2pt);
+  \node[align=center] at (1.75,-1.15) {$P$ \textbf{convex}};
+\end{tikzpicture}
+\hspace{10mm}
+\begin{tikzpicture}[scale=0.56, font=\tiny]
+  \fill[blue!10] (0,0) -- (10/3,0) -- (2.5,2.5) -- (0,10/3) -- cycle;
+  \draw[thin,gray] (0,0) -- (10/3,0) -- (2.5,2.5) -- (0,10/3) -- cycle;
+  \draw[->] (0,0) -- (3.9,0) node[below] {$x$}; \draw[->] (0,0) -- (0,3.9) node[left] {$y$};
+  \foreach \p in {(0,0),(1,0),(2,0),(3,0),(0,1),(1,1),(2,1),(3,1),(0,2),(1,2),(2,2),(0,3),(1,3)}
+    \fill \p circle (2.4pt);
+  \draw[dashed, red!75!black, thick] (0,3) -- (2,0);
+  \draw[red!75!black, very thick] (1,1.5) circle (3.4pt);
+  \node[red!75!black, anchor=west, font=\tiny] at (1.35,2.15) {$(1,\tfrac{3}{2}) \notin \mathbb{Z}^2$};
+  \node[align=center] at (1.75,-1.15) {$X = P \cap \mathbb{Z}^2$ \textbf{not convex}};
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}[scale=0.46, font=\tiny]
+  \fill[blue!8] (0,0) -- (10/3,0) -- (2.5,2.5) -- (0,10/3) -- cycle;
+  \draw[thin,gray] (0,0) -- (10/3,0) -- (2.5,2.5) -- (0,10/3) -- cycle;
+  \draw[->] (0,0) -- (3.9,0) node[below] {$x$}; \draw[->] (0,0) -- (0,3.9) node[left] {$y$};
+  \foreach \p in {(0,0),(1,0),(2,0),(3,0),(0,1),(1,1),(2,1),(3,1),(0,2),(1,2),(2,2),(0,3),(1,3)}
+    \fill \p circle (2.4pt);
+  \node[align=center] at (1.9,-1.15) {(a) pure IP\\ $x,y \in \mathbb{Z}$};
+\end{tikzpicture}\hspace{7mm}
+\begin{tikzpicture}[scale=0.46, font=\tiny]
+  \fill[blue!8] (0,0) -- (10/3,0) -- (2.5,2.5) -- (0,10/3) -- cycle;
+  \draw[thin,gray] (0,0) -- (10/3,0) -- (2.5,2.5) -- (0,10/3) -- cycle;
+  \draw[->] (0,0) -- (3.9,0) node[below] {$x$}; \draw[->] (0,0) -- (0,3.9) node[left] {$y$};
+  \draw[line width=1.8pt] (0,0) -- (0,10/3); \draw[line width=1.8pt] (1,0) -- (1,3);
+  \draw[line width=1.8pt] (2,0) -- (2,8/3); \draw[line width=1.8pt] (3,0) -- (3,1);
+  \node[align=center] at (1.9,-1.15) {(b) mixed IP\\ $x \in \mathbb{Z}$, $y$ cont.};
+\end{tikzpicture}\hspace{7mm}
+\begin{tikzpicture}[scale=0.46, font=\tiny]
+  \fill[blue!8] (0,0) -- (10/3,0) -- (2.5,2.5) -- (0,10/3) -- cycle;
+  \draw[thin,gray] (0,0) -- (10/3,0) -- (2.5,2.5) -- (0,10/3) -- cycle;
+  \draw[->] (0,0) -- (3.9,0) node[below] {$x$}; \draw[->] (0,0) -- (0,3.9) node[left] {$y$};
+  \draw[line width=1.8pt] (0,0) -- (0,10/3); \draw[line width=1.8pt] (1,0) -- (1,3);
+  \node[align=center] at (1.9,-1.15) {(c) mixed binary\\ $x \in \{0,1\}$, $y$ cont.};
+\end{tikzpicture}\\[2pt]
+{\footnotesize same $P$ --- what changes is \emph{which points you may use}}
+\end{center}
+\takeaway{one line, $\in \mathbb{Z}$, throws convexity away --- the whole course is the bill for that line.}
+
+% ---------------------------------------------------------------- 2
+\beat{2}{Why ``relax and round'' fails}
+\begin{board}
+\textbf{LP relaxation}: delete $x \in \mathbb{Z}^n$ \ $\Rightarrow$ \ optimize over $P$ instead of $X$
+\vspace{3pt}
+
+toy problem: LP optimum $(2.5,\,2.5)$, $z = 22.5$ --- just round it? \ $2^2 = 4$ candidates:
+\vspace{3pt}
+
+\begin{center}
+\begin{tabular}{c|c|c|c}
+ candidate & $x+3y \le 10$ & $3x+y \le 10$ & $z = 4x+5y$ \\ \hline
+ $(2,2)$ & $8$ \checkmark & $8$ \checkmark & $18$ \\
+ $(3,2)$ & $9$ \checkmark & $11$ $\times$ & infeasible \\
+ $(2,3)$ & $11$ $\times$ & --- & infeasible \\
+ $(3,3)$ & $12$ $\times$ & --- & infeasible \\
+\end{tabular}
+\end{center}
+
+but: \quad $(1,\,3)$: \ $10$ \checkmark, \ $6$ \checkmark, \ $z = \mathbf{19}$
+\[
+  \underbrace{z_{\mathrm{LP}} = 22.5}_{\text{bound}} \;\;\ge\;\;
+  \underbrace{z_{\mathrm{IP}} = 19}_{\text{optimum, at }(1,3)} \;\;>\;\;
+  \underbrace{18}_{\text{best rounding}}
+\]
+\end{board}
+\key{\begin{tabular}[t]{@{}l@{}}
+1. rounding loses \emph{feasibility} and \emph{optimality} --- in $n$ dims, all $2^n$ candidates can die. \\
+2. integrality changes \emph{where} the answer is. \\
+3. but $z_{\mathrm{LP}} \ge z_{\mathrm{IP}}$ \emph{always} --- deleting a constraint only enlarges the feasible set.
+\end{tabular}}
+\demo{demo1\_toy\_ip.py}{drag $c_2$: the IP optimum \emph{hops}; no rounding rule predicts the hops.}
+\takeaway{the relaxation gives not the answer but a \emph{bound} --- and bounds are how every IP is actually solved.}
+
+% ---------------------------------------------------------------- 3
+\beat{3}{Knapsack --- play it, then formulate it}
+\demo{ip-games / knapsack}{play FIRST: rucksack, 21 kg, six items. \ \url{https://hankpark0706.github.io/ip-games/knapsack.html}}
+\begin{board}
+\begin{center}
+\begin{tabular}{l|cccccc}
+ item        & rifle & boots & helmet & canteen & med kit & rations \\ \hline
+ weight (kg) & 5 & 7 & 8 & 8 & 8 & 2 \\
+ value (pts) & 9 & 8 & 9 & 8 & 3 & 9 \\
+\end{tabular}
+\qquad $W = 21$
+\end{center}
+
+$x_j = 1$ if item $j$ packed, $0$ if not \qquad --- a \emph{choice}, not a quantity
+\[
+\begin{aligned}
+  \max\quad & \textstyle\sum_j v_j\, x_j \\
+  \text{s.t.}\quad & \textstyle\sum_j w_j\, x_j \;\le\; W \\
+                   & x_j \in \{0,1\} \ \ \forall j
+\end{aligned}
+\]
+all variables binary $\Rightarrow$ a \textbf{binary program (BP)}
+\vspace{4pt}
+
+greedy (value/weight): \ rations, rifle, boots \ $= 26$ \ (14 kg)
+\vspace{2pt}
+
+optimum: \qquad\qquad\quad\ \ rations, rifle, helmet $= \mathbf{27}$ \ (15 kg)
+\[
+  \underbrace{33.875}_{\text{LP (bound)}} \;\;\ge\;\; \underbrace{27}_{\text{IP}} \;\;>\;\;
+  \underbrace{26}_{\text{greedy \emph{and} rounded LP}}
+\]
+\end{board}
+\key{one constraint, six variables --- already NP-hard.}
+\takeaway{the optimum uses 15 kg of 21 --- integrality can leave capacity on the table.}
+
+% ---------------------------------------------------------------- 4
+\beat{4}{From scalar model to matrix form --- the rewriting dictionary}
+\begin{board}
+modeling = scalar lines; solving = matrices: Gurobi receives exactly $(c, h, A, G, b)$
+\vspace{3pt}
+
+first, one with numbers --- watch every move:
+\[
+\begin{aligned}
+  \min\quad & x_1 - 2x_2 \\
+  \text{s.t.}\quad & x_1 + x_2 \ge 3 \\
+                   & x_1 - x_2 = 1 \\
+                   & x_1 \ge 0, \quad x_2 \ \text{free}
+\end{aligned}
+\qquad\Longrightarrow\qquad
+\begin{aligned}
+  -\max\quad & -x_1 + 2u - 2v \\
+  \text{s.t.}\quad & -x_1 - u + v \le -3 \\
+                   & x_1 - u + v \le 1, \quad -x_1 + u - v \le -1 \\
+                   & x_1,\, u,\, v \ge 0 \qquad (x_2 = u - v)
+\end{aligned}
+\]
+\quad min flipped, $\ge$ flipped, $=$ split into two $\le$, free $x_2$ split into $u - v$ --- then read off:
+\[
+  c = \begin{pmatrix} -1 \\ 2 \\ -2 \end{pmatrix}, \qquad
+  A = \begin{pmatrix} -1 & -1 & 1 \\ 1 & -1 & 1 \\ -1 & 1 & -1 \\ -1 & 0 & 0 \\ 0 & -1 & 0 \\ 0 & 0 & -1 \end{pmatrix}, \qquad
+  b = \begin{pmatrix} -3 \\ 1 \\ -1 \\ 0 \\ 0 \\ 0 \end{pmatrix}
+  \qquad \text{(last three rows are $x_1, u, v \ge 0$)}
+\]
+\vspace{3pt}
+
+the general dictionary:
+\begin{center}
+\begin{tabular}{lll}
+ you wrote & rewrite as & cost \\ \hline
+ $\min\, c^{\top}x$ & $-\max\, (-c)^{\top}x$ & --- \\[2pt]
+ $a^{\top}x \ge \beta$ & $-a^{\top}x \le -\beta$ & --- \\[2pt]
+ $a^{\top}x = \beta$ & $a^{\top}x \le \beta$ \ and \ $-a^{\top}x \le -\beta$ & one row \\[2pt]
+ $x_j$ free & $x_j = x_j^{+} - x_j^{-}$, \ $x_j^{+}, x_j^{-} \ge 0$ & one variable \\[2pt]
+ bound $x_j \le u_j$ & one more row & one row \\[2pt]
+ $x_j \in \{0,1\}$ & $x_j \in \mathbb{Z}$, \ $0 \le x_j \le 1$ & --- \\[2pt]
+ $a^{\top}x \le \beta$, want $=$ & $a^{\top}x + s = \beta$, \ $s \ge 0$ \ (\emph{slack}) & one variable \\[2pt]
+ $a^{\top}x \ge \beta$, want $=$ & $a^{\top}x - s = \beta$, \ $s \ge 0$ \ (\emph{surplus}) & one variable \\
+\end{tabular}
+\end{center}
+\vspace{3pt}
+
+slack $=$ the leftover, given a name \qquad
+watch: a split \emph{integer} variable needs \textbf{both} halves integer
+\end{board}
+\key{scalar form for modeling, matrix form for solving --- the \emph{same problem}. ``is it a MILP?'' is checked by reduction.}
+
+% ---------------------------------------------------------------- 5
+\beat{5}{Epigraph trick --- the objective becomes a variable}
+\begin{board}
+first, one with numbers --- three crews, mission ends when the \emph{slowest}
+finishes. make the worst case a variable $t$:
+\[
+  \min_{x}\; \max\bigl\{\, 3x_1 + x_2, \;\; x_1 + 4x_2, \;\; 2x_1 + 3x_2 \,\bigr\}
+  \quad\Longrightarrow\quad
+  \begin{aligned}[t]
+    \min_{x,\,t}\quad & t \\
+    \text{s.t.}\quad & 3x_1 + x_2 \le t, \ \ x_1 + 4x_2 \le t, \ \ 2x_1 + 3x_2 \le t
+  \end{aligned}
+\]
+\vspace{3pt}
+
+in general, worst-case objectives turn linear:
+\[
+  \min_{x}\; \max\bigl\{ f_1(x), \dots, f_k(x) \bigr\}
+  \qquad\iff\qquad
+  \begin{aligned}[t]
+  \min_{x,\,t}\quad & t \\
+  \text{s.t.}\quad & f_i(x) \le t \ \ \forall i \in [k]
+  \end{aligned}
+\]
+$t$ sits above every $f_i$; min presses it onto the largest \ $\Rightarrow$ \ optimal $t$ $=$ the max.
+\ linear $f_i$ $\Rightarrow$ an LP
+\end{board}
+\demo{demo2d / demo2e\_cvxpy.py}{the four-line cvxpy pattern, typed three times: toy LP, toy IP, matching.}
+\key{``minimize the worst case'' became linear rows --- the same move returns in weeks 9 and 13.}
+
+% ---------------------------------------------------------------- 6
+\beat{6}{Fixed costs --- paying to switch something on}
+\begin{board}
+open a site ($x \in \{0,1\}$, fixed cost $c$) before stocking $y \ge 0$ (cost $f$/unit):
+\[
+  \text{cost} \; = \; c\,x + f\,y, \qquad\quad
+  y \;\le\; M x \qquad \text{(\textbf{linking constraint}, $M$ = ``big $M$'')}
+\]
+\quad $x = 0 \ \Rightarrow\ y = 0$ \qquad\quad closed site holds nothing
+\vspace{1pt}
+
+\quad $x = 1 \ \Rightarrow\ y \le M$ \qquad\ \ open site holds up to $M$
+\end{board}
+\key{``$y > 0$'' is not linear --- no LP can see it. the binary is the price of a discontinuity: $x$ lets linear constraints say \emph{if--then}.}
+
+% ---------------------------------------------------------------- 7
+\beat{7}{Logical conditions --- binaries as switches}
+\begin{board}
+yes/no $\leftrightarrow$ yes/no: plain inequalities, no $M$ --- check by trying the $0/1$ cases:
+\vspace{3pt}
+
+\begin{center}
+\begin{tabular}{ll}
+ ``if 1 opens, 2 must open'' & $x_1 \le x_2$ \\[2pt]
+ ``3 or 4, not both'' & $x_3 + x_4 \le 1$ \\[2pt]
+ ``at most $p$ of $n$'' & $\sum_i x_i \le p$ \\[2pt]
+ ``at least $p$ of $n$'' & $\sum_i x_i \ge p$ \\[2pt]
+ ``if 1, then 2 or 3'' & $x_1 \le x_2 + x_3$ \\
+\end{tabular}
+\end{center}
+\vspace{4pt}
+
+yes/no $\leftrightarrow$ \emph{continuous} constraint: \
+\textbf{active} at $\bar y$: $a^{\top}\bar y = \beta$; \ \textbf{redundant}: deleting it changes nothing.
+\ inflate the right side --- $M \ge \max_y (a^{\top}y - \beta)$ --- and any constraint goes redundant
+\vspace{3pt}
+
+\emph{redundant $=$ switched \textbf{off}} \ $\Rightarrow$ \ $M(1-x)$ makes $x$ a \textbf{switch}:
+\[
+  a^{\top}y \;\le\; \beta + M(1-x)
+  \qquad
+  \begin{cases}
+    x = 1: & a^{\top}y \le \beta \quad \text{(enforced)}\\[2pt]
+    x = 0: & \text{redundant --- off}
+  \end{cases}
+\]
+\textbf{either--or} \ (a union --- not convex, no LP describes it):
+\[
+  a_1^{\top}y \le b_1 + M(1-x), \qquad a_2^{\top}y \le b_2 + M x, \qquad x \in \{0,1\}
+\]
+\textbf{at least $k$ of $m$}: \ one switch each, $k$ switches on:
+\[
+  a_i^{\top}y \;\le\; b_i + M(1 - x_i) \quad \forall i \in [m], \qquad
+  \textstyle\sum_{i} x_i \;\ge\; k
+\]
+\vspace{2pt}
+
+\textbf{minimum load} \ airlift $y_1$ ($0 \le y_1 \le 80$) flies in bulk or not at all:
+\ $y_1 = 0$ \ OR \ $y_1 \ge 50$
+\vspace{2pt}
+
+write it in the either--or form --- one switch:
+\[
+  y_1 \;\le\; 0 + M(1-x), \qquad
+  -y_1 \;\le\; -50 + M x, \qquad x \in \{0,1\}
+  \qquad (M = 80 \ \text{works: } y_1 \le 80)
+\]
+\quad check: \ $x = 1$: $y_1 \le 0$ enforced, the $\ge 50$ row off; \qquad
+$x = 0$: $y_1 \ge 50$ enforced, the $\le 0$ row off
+\vspace{4pt}
+
+\textbf{2 of 3 criteria} \ stockpile ($y_1$ fuel, $y_2$ ammo, $y_1 + y_2 \le 50$);
+certify if 2 of: \ total $y_1 + y_2 \ge 40$, \quad fuel $y_1 \ge 25$, \quad ammo $y_2 \ge 25$
+\vspace{2pt}
+
+flip each $\ge$ to $\le$, one switch per criterion, at least $k = 2$ on:
+\[
+  -y_1 - y_2 \;\le\; -40 + M(1-x_1), \qquad
+  -y_1 \;\le\; -25 + M(1-x_2), \qquad
+  -y_2 \;\le\; -25 + M(1-x_3)
+\]
+\[
+  x_1 + x_2 + x_3 \;\ge\; 2, \qquad x \in \{0,1\}^3
+  \qquad (M = 40,\, 25,\, 25 \ \text{suffice: with } y \ge 0 \text{ each ``off'' row is redundant})
+\]
+\quad check: \ $x = (1,1,0)$: total and fuel enforced, the ammo row off --- any two on $\Rightarrow$ certified
+\end{board}
+\demo{demo2c\_logical\_constraints.py}{``at least $k$ of 3'' on a box --- the feasible set is visibly a non-convex union.}
+\key{one idea: big-$M$ makes a constraint redundant on demand --- a binary becomes a switch. either--or, $k$-of-$m$, if--then: the same switch, different wiring.}
+
+% ---------------------------------------------------------------- 8
+\beat{8}{How big should $M$ be?}
+\begin{board}
+\textbf{too small: WRONG.} \ the ``off'' constraint still cuts feasible plans --- the solver silently
+returns the best plan \emph{of the wrong problem}
+\vspace{3pt}
+
+\textbf{too large: WEAK.} \ $x = 0.01$, $M = 10^5$ already unlocks $y \le 1000$ ---
+bound far from truth, solver slow
+\vspace{3pt}
+
+the craft: the \textbf{smallest certainly-valid $M$} --- a physical quantity (budget, demand, capacity), never $10^6$
+\end{board}
+\demo{demo2\_sparse\_regression.py}{drag $M$ down: coefficients pin against $\pm M$ --- a silent modeling bug, live.}
+
+% ---------------------------------------------------------------- 9
+\beat{9}{Capstone --- binary variables doing machine learning}
+\begin{board}
+the same link doing \emph{feature selection}: \ $x_j \in \{0,1\}$ = ``feature $j$ used''; penalize the count:
+\[
+\begin{aligned}
+  \min_{\beta,\,x}\quad & \frac{1}{n} \sum_{i=1}^{n} \Bigl( y_i - \textstyle\sum_{j} \beta_j x_{ij} \Bigr)^{2}
+    \;+\; \lambda \textstyle\sum_{j} x_j \\
+  \text{s.t.}\quad & -M x_j \;\le\; \beta_j \;\le\; M x_j, \qquad x_j \in \{0,1\}
+\end{aligned}
+\]
+$x_j = 0 \Rightarrow \beta_j = 0$; \ $x_j = 1 \Rightarrow \beta_j \in [-M, M]$. \qquad
+$\lambda$ = the fixed charge, per feature
+\vspace{3pt}
+
+\textbf{best-subset selection} ($\ell_0$) --- the honest version of what lasso approximates
+\end{board}
+\demo{demo2b\_sparse\_linear\_regression.py}{8 features, 3 real: raise $\lambda$, watch features switch off; a good $\lambda$ recovers exactly the true 3.}
+\takeaway{one trick, three costumes: $y \le Mx$, \ $a^{\top}y \le b + M(1-x)$, \ $-Mx_j \le \beta_j \le Mx_j$. choose $M$ as small as validity allows.}
+
+% ---------------------------------------------------------------- 10
+\beat{10}{Matching --- a model born canonical}
+\begin{board}
+3 pilots, 3 aircraft, $c_{ij}$ = value of pairing $(i,j)$. \ the decision is a \emph{table}:
+\[
+  X \in \{0,1\}^{3\times 3}, \qquad x_{ij} = 1 \ \text{iff pilot } i \text{ flies aircraft } j
+\]
+rows sum to 1 (each pilot once), columns sum to 1 (each aircraft once):
+\[
+\begin{aligned}
+  \max_X\quad & \langle C, X \rangle \\
+  \text{s.t.}\quad & X \mathbf{1} = \mathbf{1}, \quad X^{\top}\mathbf{1} = \mathbf{1}, \quad X \ge 0
+\end{aligned}
+\]
+\emph{read the symbols:} \ $\langle C, X \rangle = \sum_{i,j} c_{ij} x_{ij}$, \quad $\mathbf{1}$ = all-ones vector
+\vspace{3pt}
+
+matrix form by \textbf{flattening}: $x = \operatorname{vec}(X) \in \mathbb{R}^9$, \ $c = \operatorname{vec}(C)$
+\ $\Rightarrow$ \ a $6 \times 9$ matrix of 0/1, \ $b = \mathbf{1}$
+\vspace{3pt}
+
+\quad \textbullet\ each column of $A$: exactly \textbf{two ones} \ (an \emph{incidence matrix})
+\vspace{1pt}
+
+\quad \textbullet\ binaries already gone: row sums $= 1$ with $x \ge 0$ cap every variable at 1
+\vspace{1pt}
+
+\quad \textbullet\ $\operatorname{rank} A = 5$: any one row is implied by the rest
+\end{board}
+\demo{demo2d (ex.\ 3), demo3\_assignment\_matching.py}{solve with \emph{no} integrality declared --- the answer is a permutation matrix, max fractionality $= 0$ every time.}
+\takeaway{matching's LP returns whole numbers with no integrality declared. the reason has a name --- \emph{total unimodularity} --- next lecture.}
+
+% ---------------------------------------------------------------- next
+\par\medskip
+{\color{ruleink}\rule{\textwidth}{1.2pt}}\par\nobreak\vspace{3pt}
+{\color{keyink}\small\textbf{next lecture}\quad assignment, transportation --- and \emph{total unimodularity}: why matching's LP came back integer. \ \textbf{Homework 1 is out} (due week 4).}
+
+\end{document}
