@@ -13,6 +13,7 @@
 \usepackage{graphicx}
 \usepackage{array}
 \usepackage{tikz}
+\usepackage{kotex}
 \usepackage[hidelinks]{hyperref}
 
 \definecolor{ruleink}{RGB}{18, 68, 140}
@@ -53,8 +54,8 @@
 
 \begin{document}
 
-{\Large\bfseries Week 2--3 --- Integer Programs and the Binary-Variable Toolbox}\\[2pt]
-{\small OL7014 Integer Programming \quad\textbullet\quad Instructor: Prof.\ H.\ Park \quad\textbullet\quad Weeks of Aug 31 \& Sep 7, 2026}
+{\Large\bfseries Week 2 --- Integer Programs and the Binary-Variable Toolbox}\\[2pt]
+{\small OL7014 Integer Programming \quad\textbullet\quad Instructor: Prof.\ H.\ Park \quad\textbullet\quad Week of Aug 31, 2026}
 
 % ---------------------------------------------------------------- 1
 \beat{1}{Integer Programming (IP): add integrality --- and lose convexity}
@@ -297,16 +298,59 @@ watch: a split \emph{integer} variable needs \textbf{both} halves integer
 % ---------------------------------------------------------------- 5
 \beat{5}{Epigraph trick --- the objective becomes a variable}
 \begin{board}
-first, one with numbers --- three crews, mission ends when the \emph{slowest}
-finishes. make the worst case a variable $t$:
+first, one with numbers --- a single dial $x$; three crews, crew $i$ finishes at
+time $f_i(x)$; the mission ends when the \emph{slowest} crew finishes. make the
+worst case a variable $t$:
 \[
-  \min_{x}\; \max\bigl\{\, 3x_1 + x_2, \;\; x_1 + 4x_2, \;\; 2x_1 + 3x_2 \,\bigr\}
+  \min_{x}\; \max\bigl\{\, \underbrace{10 + 2x}_{f_1(x)}, \;\;
+                           \underbrace{40 - 3x}_{f_2(x)}, \;\;
+                           \underbrace{30 - x}_{f_3(x)} \,\bigr\}
   \quad\Longrightarrow\quad
   \begin{aligned}[t]
     \min_{x,\,t}\quad & t \\
-    \text{s.t.}\quad & 3x_1 + x_2 \le t, \ \ x_1 + 4x_2 \le t, \ \ 2x_1 + 3x_2 \le t
+    \text{s.t.}\quad & 10 + 2x \le t, \ \ 40 - 3x \le t, \ \ 30 - x \le t
   \end{aligned}
 \]
+\begin{center}
+\begin{tikzpicture}[xscale=0.36, yscale=0.058, font=\tiny]
+  \draw[->] (0,0) -- (11.0,0) node[below] {$x$};
+  \draw[->] (0,0) -- (0,47) node[left] {$t$};
+  \draw[very thick, ruleink] (0,10) -- (10,30);
+  \draw[very thick, demoink] (0,40) -- (10,10);
+  \draw[very thick, watchink] (0,30) -- (10,20);
+  \node[ruleink, anchor=west] at (10.15,30) {$f_1 = 10 + 2x$};
+  \node[demoink, anchor=west] at (10.15,10) {$f_2 = 40 - 3x$};
+  \node[watchink, anchor=west] at (10.15,20) {$f_3 = 30 - x$};
+  \node[align=center] at (6.4,-11) {three finish times,\\ one variable $x$};
+\end{tikzpicture}
+\hspace{7mm}
+\begin{tikzpicture}[xscale=0.36, yscale=0.058, font=\tiny]
+  \draw[->] (0,0) -- (11.0,0) node[below] {$x$};
+  \draw[->] (0,0) -- (0,47) node[left] {$t$};
+  \draw[very thick, ruleink!30] (0,10) -- (10,30);
+  \draw[very thick, demoink!30] (0,40) -- (10,10);
+  \draw[very thick, watchink!30] (0,30) -- (10,20);
+  \draw[ultra thick, black] (0,40) -- (5,25) -- (6.667,23.33) -- (10,30);
+  \fill (5,25) circle (1.6pt); \fill (6.667,23.33) circle (1.6pt);
+  \node[align=center] at (5.5,-11) {$\max\{f_1, f_2, f_3\}$ in black:\\ the topmost line everywhere};
+\end{tikzpicture}
+\hspace{7mm}
+\begin{tikzpicture}[xscale=0.36, yscale=0.058, font=\tiny]
+  \draw[->] (0,0) -- (11.0,0) node[below] {$x$};
+  \draw[->] (0,0) -- (0,47) node[left] {$t$};
+  \draw[ruleink!30] (0,10) -- (10,30);
+  \draw[demoink!30] (0,40) -- (10,10);
+  \draw[watchink!30] (0,30) -- (10,20);
+  \draw[ultra thick, black!80] (0,40) -- (5,25) -- (6.667,23.33) -- (10,30);
+  \draw[dashed, red!75!black] (6.667,23.33) -- (6.667,0);
+  \fill[red!75!black] (6.667,23.33) circle (1.9pt);
+  \node[red!75!black, anchor=west] at (6.85,4.5) {$x^{\star} = \tfrac{20}{3}$};
+  \node[red!75!black, align=center, anchor=south] at (6.6,34)
+    {$t^{\star} = \min t$ \ s.t.\\ $t \ge f_1,\, t \ge f_2,\, t \ge f_3$};
+  \draw[->, red!75!black] (6.5,33) -- (6.65,24.9);
+  \node[align=center] at (5.2,-11) {piecewise linear;\\ $t^{\star} = \tfrac{70}{3}$ at the kink};
+\end{tikzpicture}
+\end{center}
 \vspace{3pt}
 
 in general, worst-case objectives turn linear:
@@ -321,7 +365,6 @@ in general, worst-case objectives turn linear:
 $t$ sits above every $f_i$; min presses it onto the largest \ $\Rightarrow$ \ optimal $t$ $=$ the max.
 \ linear $f_i$ $\Rightarrow$ an LP
 \end{board}
-\demo{demo2d / demo2e\_cvxpy.py}{the four-line cvxpy pattern, typed three times: toy LP, toy IP, matching.}
 \key{``minimize the worst case'' became linear rows --- the same move returns in weeks 9 and 13.}
 
 % ---------------------------------------------------------------- 6
@@ -346,12 +389,16 @@ yes/no $\leftrightarrow$ yes/no: plain inequalities, no $M$ --- check by trying 
 \vspace{3pt}
 
 \begin{center}
-\begin{tabular}{ll}
- ``if 1 opens, 2 must open'' & $x_1 \le x_2$ \\[2pt]
- ``3 or 4, not both'' & $x_3 + x_4 \le 1$ \\[2pt]
- ``at most $p$ of $n$'' & $\sum_i x_i \le p$ \\[2pt]
- ``at least $p$ of $n$'' & $\sum_i x_i \ge p$ \\[2pt]
- ``if 1, then 2 or 3'' & $x_1 \le x_2 + x_3$ \\
+\begin{tabular}{lll}
+ ``if 1 is on, 2 must be on'' & {\footnotesize 1을 켜면 2도 켜야} & $x_1 \le x_2$ \\[2pt]
+ ``1 or 2 --- at least one on (both fine)'' & {\footnotesize 1 또는 2 중 최소 하나 켬 (둘 다 가능)} & $x_1 + x_2 \ge 1$ \\[2pt]
+ ``1 or 2 --- not both on (neither fine)'' & {\footnotesize 1 또는 2 중 최대 하나 켬 (둘 다는 불가)} & $x_1 + x_2 \le 1$ \\[2pt]
+ ``either 1 or 2 --- exactly one on'' & {\footnotesize 1 또는 2 중 정확히 하나 켬} & $x_1 + x_2 = 1$ \\[2pt]
+ ``at most $p$ of $n$ on'' & {\footnotesize $n$개 중 최대 $p$개 켬} & $\sum_{i \in [n]} x_i \le p$ \\[2pt]
+ ``at least $p$ of $n$ on'' & {\footnotesize $n$개 중 최소 $p$개 켬} & $\sum_{i \in [n]} x_i \ge p$ \\[2pt]
+ ``if 1 is on, then 2 or 3 is on'' & {\footnotesize 1을 켜면 2 또는 3도 켜야} & $x_1 \le x_2 + x_3$ \\[2pt]
+ ``if 1 is on, then \emph{either} 2 or 3 is on'' & {\footnotesize 1을 켜면 2 또는 3 중 하나만 켜야} & $x_1 \le x_2 + x_3, \ \ x_2 + x_3 \le 2 - x_1$ \\[2pt]
+ ``1 on: exactly one of 2, 3 on --- 1 off: both off'' & {\footnotesize 1 켜면 2$\cdot$3 중 하나만, 끄면 둘 다 끔} & $x_1 = x_2 + x_3$ \\
 \end{tabular}
 \end{center}
 \vspace{4pt}
@@ -370,6 +417,40 @@ yes/no $\leftrightarrow$ \emph{continuous} constraint: \
     x = 0: & \text{redundant --- off}
   \end{cases}
 \]
+\emph{example:} \ on the box $0 \le y_1 \le 100$, \ $0 \le y_2 \le 60$:
+\quad $2y_1 + 3y_2 \;\le\; 6 + M(1-x)$
+\vspace{1pt}
+
+\quad smallest valid $M = \max_y\,(2y_1 + 3y_2) - 6
+  = 2 \cdot 100 + 3 \cdot 60 - 6 = 374$ \quad --- each $y_j$ at its own worst bound
+\begin{center}
+\begin{tikzpicture}[scale=0.55, font=\tiny]
+  \fill[blue!10] (0,0) -- (3,0) -- (0,2) -- cycle;
+  \draw[thin,gray] (0,0) rectangle (4.4,2.8);
+  \draw[very thick, blue!65!black] (3,0) -- (0,2);
+  \draw[->] (0,0) -- (5.8,0) node[right] {$y_1$};
+  \draw[->] (0,0) -- (0,4.2) node[left] {$y_2$};
+  \node[below] at (4.4,-0.05) {$100$};
+  \node[left] at (-0.05,2.8) {$60$};
+  \node[align=center] at (2.6,-1.05) {$x = 1$: \ $2y_1 + 3y_2 \le 6$\\ \textbf{enforced} --- the line cuts the box};
+\end{tikzpicture}
+\hspace{12mm}
+\begin{tikzpicture}[scale=0.55, font=\tiny]
+  \fill[blue!10] (0,0) rectangle (4.4,2.8);
+  \draw[thin,gray] (0,0) rectangle (4.4,2.8);
+  \draw[very thick, blue!65!black, dashed] (2.6,4.0) -- (5.8,1.87);
+  \fill[red!75!black] (4.4,2.8) circle (2.2pt);
+  \node[red!75!black, anchor=north east, inner sep=1.5pt] at (4.32,2.72) {$(100,60)$};
+  \draw[->] (0,0) -- (5.8,0) node[right] {$y_1$};
+  \draw[->] (0,0) -- (0,4.2) node[left] {$y_2$};
+  \node[align=center] at (2.6,-1.05) {$x = 0$: \ $2y_1 + 3y_2 \le 6 + 374 = 380$\\ \textbf{redundant} --- whole box feasible};
+\end{tikzpicture}
+\end{center}
+activating the big-$M$ term slides the line out of the box --- and with the
+\emph{smallest} valid $M$ it rests exactly on the far corner $(100,60)$: any smaller
+$M$ would still cut the box (WRONG --- next section). \ \emph{sketches not to scale}
+\vspace{3pt}
+
 \textbf{either--or} \ (a union --- not convex, no LP describes it):
 \[
   a_1^{\top}y \le b_1 + M(1-x), \qquad a_2^{\top}y \le b_2 + M x, \qquad x \in \{0,1\}
@@ -377,7 +458,7 @@ yes/no $\leftrightarrow$ \emph{continuous} constraint: \
 \textbf{at least $k$ of $m$}: \ one switch each, $k$ switches on:
 \[
   a_i^{\top}y \;\le\; b_i + M(1 - x_i) \quad \forall i \in [m], \qquad
-  \textstyle\sum_{i} x_i \;\ge\; k
+  \textstyle\sum_{i \in [m]} x_i \;\ge\; k
 \]
 \vspace{2pt}
 
@@ -427,63 +508,10 @@ bound far from truth, solver slow
 
 the craft: the \textbf{smallest certainly-valid $M$} --- a physical quantity (budget, demand, capacity), never $10^6$
 \end{board}
-\demo{demo2\_sparse\_regression.py}{drag $M$ down: coefficients pin against $\pm M$ --- a silent modeling bug, live.}
-
-% ---------------------------------------------------------------- 9
-\beat{9}{Capstone --- binary variables doing machine learning}
-\begin{board}
-the same link doing \emph{feature selection}: \ $x_j \in \{0,1\}$ = ``feature $j$ used''; penalize the count:
-\[
-\begin{aligned}
-  \min_{\beta,\,x}\quad & \frac{1}{n} \sum_{i=1}^{n} \Bigl( y_i - \textstyle\sum_{j} \beta_j x_{ij} \Bigr)^{2}
-    \;+\; \lambda \textstyle\sum_{j} x_j \\
-  \text{s.t.}\quad & -M x_j \;\le\; \beta_j \;\le\; M x_j, \qquad x_j \in \{0,1\}
-\end{aligned}
-\]
-$x_j = 0 \Rightarrow \beta_j = 0$; \ $x_j = 1 \Rightarrow \beta_j \in [-M, M]$. \qquad
-$\lambda$ = the fixed charge, per feature
-\vspace{3pt}
-
-\textbf{best-subset selection} ($\ell_0$) --- the honest version of what lasso approximates
-\end{board}
-\demo{demo2b\_sparse\_linear\_regression.py}{8 features, 3 real: raise $\lambda$, watch features switch off; a good $\lambda$ recovers exactly the true 3.}
-\takeaway{one trick, three costumes: $y \le Mx$, \ $a^{\top}y \le b + M(1-x)$, \ $-Mx_j \le \beta_j \le Mx_j$. choose $M$ as small as validity allows.}
-
-% ---------------------------------------------------------------- 10
-\beat{10}{Matching --- a model born canonical}
-\begin{board}
-3 pilots, 3 aircraft, $c_{ij}$ = value of pairing $(i,j)$. \ the decision is a \emph{table}:
-\[
-  X \in \{0,1\}^{3\times 3}, \qquad x_{ij} = 1 \ \text{iff pilot } i \text{ flies aircraft } j
-\]
-rows sum to 1 (each pilot once), columns sum to 1 (each aircraft once):
-\[
-\begin{aligned}
-  \max_X\quad & \langle C, X \rangle \\
-  \text{s.t.}\quad & X \mathbf{1} = \mathbf{1}, \quad X^{\top}\mathbf{1} = \mathbf{1}, \quad X \ge 0
-\end{aligned}
-\]
-\emph{read the symbols:} \ $\langle C, X \rangle = \sum_{i,j} c_{ij} x_{ij}$, \quad $\mathbf{1}$ = all-ones vector
-\vspace{3pt}
-
-matrix form by \textbf{flattening}: $x = \operatorname{vec}(X) \in \mathbb{R}^9$, \ $c = \operatorname{vec}(C)$
-\ $\Rightarrow$ \ a $6 \times 9$ matrix of 0/1, \ $b = \mathbf{1}$
-\vspace{3pt}
-
-\quad \textbullet\ each column of $A$: exactly \textbf{two ones} \ (an \emph{incidence matrix})
-\vspace{1pt}
-
-\quad \textbullet\ binaries already gone: row sums $= 1$ with $x \ge 0$ cap every variable at 1
-\vspace{1pt}
-
-\quad \textbullet\ $\operatorname{rank} A = 5$: any one row is implied by the rest
-\end{board}
-\demo{demo2d (ex.\ 3), demo3\_assignment\_matching.py}{solve with \emph{no} integrality declared --- the answer is a permutation matrix, max fractionality $= 0$ every time.}
-\takeaway{matching's LP returns whole numbers with no integrality declared. the reason has a name --- \emph{total unimodularity} --- next lecture.}
-
 % ---------------------------------------------------------------- next
+\enlargethispage{4\baselineskip}
 \par\medskip
 {\color{ruleink}\rule{\textwidth}{1.2pt}}\par\nobreak\vspace{3pt}
-{\color{keyink}\small\textbf{next lecture}\quad assignment, transportation --- and \emph{total unimodularity}: why matching's LP came back integer. \ \textbf{Homework 1 is out} (due week 4).}
+{\color{keyink}\small\textbf{next lecture}\quad the binary capstone (best-subset selection), matching --- and the classic IP models: assignment, transportation, \emph{total unimodularity}. \ \textbf{Homework 1 is out} (due week 4).}
 
 \end{document}
