@@ -15,10 +15,10 @@ demos, and Colab-ready notebooks, updated weekly as the course progresses.
 
 ## Weekly materials
 
-| Week | Date | Topic | Lecture note | Notebook | Video | Misc |
+| Week | Date | Topic | Lecture note | Notebook | Video <img width="320" alt=""> | Misc |
 |---|---|---|:---:|:---:|:---:|---|
 | 1 | 8/25 | Optimization is everywhere; what is a convex problem | [week01](lecture-notes/week01-note.pdf) | | [Optimization: A Bootcamp for Machine Learning, Inverse Problems, and Control](https://www.youtube.com/watch?v=lPBPbGmw1_4) | |
-| 2 | 9/1 | LP vs IP; reformulation tricks | | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/hankpark0706/OL7014/blob/main/notebooks/week1_knapsack.ipynb) | [Optimization with Linear Programming (and the Simplex Algorithm), Main Ideas](https://www.youtube.com/watch?v=h5o1n1QMcmM)<br>[George Dantzig, The Accidental Maths Genius (Good Will Hunting in Real Life)](https://www.youtube.com/watch?v=xynFFqcSZDY) | **HW#1 out** (due 9/15) |
+| 2 | 9/1 | LP vs IP; reformulation tricks | | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/hankpark0706/OL7014/blob/main/notebooks/week1_knapsack.ipynb) | 1. [Optimization with Linear Programming (and the Simplex Algorithm), Main Ideas](https://www.youtube.com/watch?v=h5o1n1QMcmM)<br>2. [George Dantzig, The Accidental Maths Genius (Good Will Hunting in Real Life)](https://www.youtube.com/watch?v=xynFFqcSZDY) | **HW#1 out** (due 9/15) |
 | 3 | 9/8 | Classic IP models | | | | |
 | 4 | 9/15 | Guest lecture and Gurobi tutorial | | | | |
 | 5 | 9/22 | Network problems; location–allocation problem (LAP) | | | | **HW#2 out** (due 10/6) |
