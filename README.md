@@ -19,8 +19,8 @@ demos, and Colab-ready notebooks, updated weekly as the course progresses.
 |---|---|---|:---:|:---:|:---:|---|
 | 1 | 8/25 | Optimization is everywhere; what is a convex problem | [week01](lecture-notes/week01-note.pdf) | | [Optimization: A Bootcamp for Machine Learning, Inverse Problems, and Control](https://www.youtube.com/watch?v=lPBPbGmw1_4) | |
 | 2 | 9/1 | LP vs IP; reformulation tricks | [week02](lecture-notes/week02-03-note.pdf) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/hankpark0706/OL7014/blob/main/notebooks/week1_knapsack.ipynb) | 1. [Optimization with Linear Programming (and the Simplex Algorithm), Main Ideas](https://www.youtube.com/watch?v=h5o1n1QMcmM)<br>2. [George Dantzig, The Accidental Maths Genius (Good Will Hunting in Real Life)](https://www.youtube.com/watch?v=xynFFqcSZDY) | **[HW#1](homework/hw01.pdf) out** (due 9/15) |
-| 3 | 9/8 | Classic IP models | | | | |
-| 4 | 9/15 | Guest lecture and Gurobi tutorial | 1. [Gurobi Intelligence](lecture-notes/2609_KNDU_Gurobi%20Intelligence.pdf)<br>2. [Trusted AI for Defense Decisions](lecture-notes/2609_KNDU_Trusted%20AI%2BDefense%20Decisions.pdf) | | | **[HW1 solution](homework/hw01-sol.pdf)** |
+| 3 | 9/15 | Guest lecture and Gurobi tutorial | 1. [Gurobi Intelligence](lecture-notes/2609_KNDU_Gurobi%20Intelligence.pdf)<br>2. [Trusted AI for Defense Decisions](lecture-notes/2609_KNDU_Trusted%20AI%2BDefense%20Decisions.pdf) | | | **[HW1 solution](homework/hw01-sol.pdf)** |
+| 4 | 9/18 | Classic IP models | | | | |
 | 5 | 9/22 | Network problems; location–allocation problem (LAP) | | | | **HW#2 out** (due 10/6) |
 | 6 | 9/29 | Alternative formulations | | | | **Project topic pitch** (oral) |
 | 7 | 10/6 | Branch-and-bound; midterm review | | | | |
