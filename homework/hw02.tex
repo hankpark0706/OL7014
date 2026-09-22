@@ -1,0 +1,202 @@
+% ============================================================================
+% Homework 2 -- covers Weeks 5-6 (LP relaxation, assignment, transportation,
+% total unimodularity, MCNF, facility location, the LAP, alternative
+% formulations). Theme: when is the LP relaxation the IP?
+% Self-contained on purpose -- no \input{preamble} -- compiles with pdflatex.
+% ============================================================================
+\documentclass[10pt]{article}
+
+\usepackage[a4paper, margin=2.2cm]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+
+\definecolor{ruleink}{RGB}{18, 68, 140}
+\definecolor{keyink}{RGB}{20, 90, 20}
+
+\setlength{\parindent}{0pt}
+\pagestyle{plain}
+
+\AtBeginDocument{%
+  \abovedisplayskip=5pt plus 1pt
+  \belowdisplayskip=5pt plus 1pt
+  \abovedisplayshortskip=3pt
+  \belowdisplayshortskip=3pt}
+
+% ---- one problem -----------------------------------------------------------
+\newcommand{\problem}[2]{%   points, title
+  \par\bigskip
+  {\color{ruleink}\rule{\textwidth}{1pt}}\par\nobreak\vspace{3pt}
+  {\large\bfseries #2}\hfill{\normalsize\bfseries(#1 points)}\par\nobreak\vspace{4pt}}
+
+\newlist{parts}{enumerate}{1}
+\setlist[parts]{label=(\alph*), leftmargin=2.2em, itemsep=3pt}
+
+\begin{document}
+
+\begin{center}
+  {\large OL7014 Integer Programming}\\[3pt]
+  {\Large\bfseries Homework 2}\\[4pt]
+  {\small \textbf{Due Oct 6, start of class}}
+\end{center}
+\medskip\hrule\medskip
+
+Write down your solutions and submit them as a single PDF to
+\texttt{lossof0706@gmail.com}.
+
+% ================================================================ Problem 1
+\problem{20}{Problem 1. Cadets and a married couple}
+
+Three cadets (A, B, C) are commissioned into three branches, one each, to maximize the
+total fit:
+\begin{center}
+\begin{tabular}{c|ccc}
+ fit & Signal & Artillery & Engineers \\ \hline
+ cadet A & 2 & 5 & 1 \\
+ cadet B & 5 & 3 & 2 \\
+ cadet C & 2 & 3 & 5 \\
+\end{tabular}
+\end{center}
+
+\begin{parts}
+\item \textbf{(5 pts)} Formulate the IP and write it as $\max\, c^{\top}x$ s.t.\
+  $Ax = b$, $x \in \{0,1\}^9$, with $x$ flattened row by row. Write $c$, $A$, $b$ with
+  numbers.
+\item \textbf{(4 pts)} Show that $A$ is TU with the checklist (give $M_1$, $M_2$). What
+  does this say about the LP relaxation?
+\item \textbf{(3 pts)} Solve the LP relaxation with \texttt{gurobipy} and confirm the
+  solution is integral. Include a screenshot of your code and its output.
+\item \textbf{(3 pts)} Cadets A and B are married, and policy forbids sending A to
+  Artillery \emph{and} B to Signal (both are overseas tours). Write this as one linear
+  constraint.
+\item \textbf{(5 pts)} Add the constraint and solve both the LP relaxation and the IP.
+  Report both solutions and the gap, and explain where the fractions come from.
+\end{parts}
+
+% ================================================================ Problem 2
+\problem{20}{Problem 2. Absolute cap or relative cap?}
+
+Two drone teams fly $x_1$ (North) and $x_2$ (South) sorties, $x \in \mathbb{Z}^2_{+}$,
+to maximize $3x_1 + 2x_2$. The tanker carries fuel for at most $6$ sorties in total.
+Two rules are proposed to keep North from taking all the fuel:
+\begin{center}
+\begin{tabular}{l@{\qquad}l}
+ \textbf{Version I}  & $x_1 \le 3$ \quad (North flies at most $3$ sorties) \\[2pt]
+ \textbf{Version II} & $x_1 - x_2 \le 1$ \quad (North flies at most one more than South)
+\end{tabular}
+\end{center}
+Hand work only for this problem.
+
+\begin{parts}
+\item \textbf{(4 pts)} Write both IPs as $\max\, c^{\top}x$ s.t.\ $Ax \le b$,
+  $x \in \mathbb{Z}^2_{+}$ (tanker row first). Compute every square-submatrix
+  determinant of $A_{\mathrm{I}}$ and $A_{\mathrm{II}}$: which is TU? Why can a cap on a
+  single variable, $x_j \le u_j$, never destroy TU?
+\item \textbf{(6 pts)} Draw both LP relaxations and mark their lattice points. Report
+  $z_{\mathrm{LP}}$ and $z_{\mathrm{IP}}$ for each version and explain the gap using (a).
+\item \textbf{(5 pts)} Keep $A_{\mathrm{II}}$ with an integer right-hand side
+  $b = (b_1, b_2)$, $b_1 \ge b_2 \ge 0$. Solve for the corner where both rows are tight
+  and show it is integral exactly when $b_1 + b_2$ is even. At $b = (7,1)$ the LP
+  optimum is integral --- does that make $A_{\mathrm{II}}$ TU?
+\item \textbf{(5 pts)} In Version~I, North's real limit is $7$ battery packs at $2$ per
+  sortie, and a staff officer writes $x_1 \le 3.5$. Solve the LP relaxation. Which
+  hypothesis of Hoffman--Kruskal fails? Fix the row by rounding.
+\end{parts}
+
+% ================================================================ Problem 3
+\problem{20}{Problem 3. Relief convoys}
+
+Relief trucks move from two sources through a hub to two divisions, whole truckloads
+only, at minimum cost. All roads are one-way.
+\begin{center}
+\begin{tabular}[t]{c|l|r}
+ node & & $b_i$ \\ \hline
+ 1 & Port     & $+9$ \\
+ 2 & Airfield & $+5$ \\
+ 3 & Hub      & $0$ \\
+ 4 & North    & $-8$ \\
+ 5 & South    & $-6$ \\
+\end{tabular}
+\qquad
+\begin{tabular}[t]{c|ccccccc}
+ road      & $(1,3)$ & $(1,4)$ & $(2,3)$ & $(2,5)$ & $(3,4)$ & $(3,5)$ & $(4,5)$ \\ \hline
+ cost      & 3 & 7 & 2 & 6 & 2 & 3 & 2 \\
+ capacity  & 8 & 4 & 5 & 3 & 7 & 6 & 3 \\
+\end{tabular}
+\end{center}
+
+\begin{parts}
+\item \textbf{(3 pts)} Which problem from Week~5 can model this problem? Draw the graph
+  and define $G = (V, E)$.
+\item \textbf{(4 pts)} Define your decision variable $x$. Write the corresponding matrix
+  $A$ and vectors $c$, $b$, and specify the dimension of each, e.g.\
+  $x \in \mathbb{R}^{?}$, $A \in \mathbb{R}^{? \times ?}$.
+\item \textbf{(4 pts)} Explain why $A$ is TU. Solve the LP relaxation with
+  \texttt{gurobipy} and confirm that every flow is a whole truckload. Include a
+  screenshot of your code and its output.
+\item \textbf{(5 pts)} Roads $(1,3)$ and $(3,4)$ share a highway that carries at most
+  $10$ truckloads. Add this constraint, solve the LP relaxation and the IP, and report
+  the gap. Find a $2 \times 2$ submatrix with determinant $\pm 2$ that explains it.
+\item \textbf{(4 pts)} Drop the highway rule. The Hub can instead receive at most $10$
+  truckloads: model this by splitting the Hub into Hub-in and Hub-out, joined by a dock
+  road of capacity $10$. Is the new model still TU? Solve its LP relaxation. What is the
+  modelling lesson compared with (d)?
+\end{parts}
+
+% ================================================================ Problem 4
+\problem{20}{Problem 4. The LAP}
+
+Two bases (1: North, 2: South) may hold a relief reserve for a town (3) with demand
+$8$\,t and a village (4) with demand $4$\,t. Opening costs are $f_1 = 20$, $f_2 = 16$.
+The five one-way roads cost, per ton, $c_{13} = 2$, $c_{23} = 4$, $c_{24} = 1$,
+$c_{34} = 1$, $c_{43} = 2$ (no capacities). Use the Week~6 LAP with $h_i = 1$,
+$u_i = 40$, $o_i = 1$, $B = 16$, $p = 1$, and linking rows $r_i \le B x_i$.
+
+\begin{parts}
+\item \textbf{(5 pts)} Write the LAP for this instance with numbers.
+\item \textbf{(5 pts)} Which entries of the constraint matrix break TU? Show that once
+  $x$ is fixed, the rest of the model is TU. (Hint: read the budget row as the
+  conservation row of one more node.)
+\item \textbf{(6 pts)} Solve the IP and its LP relaxation with \texttt{gurobipy} and
+  report both plans and the gap. Then fix $x$ at the IP's value and solve the LP again:
+  is the solution integral, and why?
+\item \textbf{(4 pts)} Which variables are stage~1 and which are stage~2? Keep the IP's
+  stage-1 decisions but let the town's demand be $10$\,t. Solve stage~2: what is the
+  total cost, and where does the shortage land?
+\end{parts}
+
+% ================================================================ Problem 5
+\problem{20}{Problem 5. Strong vs weak linking}
+
+Three candidate depots D1, D2, D3 and three brigades B1, B2, B3 sit on a ring road
+D1--B1--D2--B2--D3--B3--D1; each brigade can be supplied only by its two neighbouring
+depots. Let $x_i \in \{0,1\}$ open depot D$i$, and $y_{ij} \ge 0$ be the \emph{fraction} of
+brigade B$j$'s demand supplied by D$i$ (shipping cost $c_{ij} d_j y_{ij}$).
+\begin{center}
+\begin{tabular}{l|ccc|c}
+ cost per ton & B1 & B2 & B3 & opening cost \\ \hline
+ D1 & 1 & --- & 2 & 20 \\
+ D2 & 2 & 1 & --- & 16 \\
+ D3 & --- & 2 & 1 & 18 \\ \hline
+ demand (t) & 4 & 5 & 6 & \\
+\end{tabular}
+\end{center}
+
+\begin{parts}
+\item \textbf{(5 pts)} Write the \emph{strong} formulation (one row $y_{ij} \le x_i$ per
+  road) and the \emph{weak} formulation (one row $\sum_j y_{ij} \le M x_i$ per depot).
+  What is the smallest valid $M$ here?
+\item \textbf{(4 pts)} Prove that the strong formulation is better, using the two-step
+  recipe.
+\item \textbf{(6 pts)} Solve the IP and both LP relaxations with \texttt{gurobipy}.
+  Verify $z_{\mathrm{LP}}^{\text{weak}} \le z_{\mathrm{LP}}^{\text{strong}} \le z_{\mathrm{IP}}$,
+  and say which bound is more useful. Include a screenshot of your code and its output.
+\item \textbf{(5 pts)} The strong LP is still fractional, so its matrix is not TU.
+  Derive $x_i + x_{i'} \ge 1$ for each brigade's two depots; which $3 \times 3$ matrix
+  from the Week~5 note do these rows form? Add them, divide by $2$ and round up: does
+  this cut close the gap?
+\end{parts}
+
+\end{document}
