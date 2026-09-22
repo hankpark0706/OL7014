@@ -91,7 +91,7 @@ week 2: \ $22.5 \ge 19$ on the toy, rounding worth only $18$ --- a \textbf{bound
 
 % ---------------------------------------------------------------- 2
 \beat{2}{Assignment --- a model born canonical}
-\demo{ip-games / assignment}{play FIRST: three pilots, three aircraft, one each. \ \url{https://hankpark0706.github.io/ip-games/assignment-matching.html}}
+\demo{ip-games / assignment}{play FIRST: four cadets, four branches, one each --- the board below is the same model at $n = 3$. \ \url{https://hankpark0706.github.io/ip-games/assignment-matching.html}}
 \begin{board}
 3 pilots, 3 aircraft, one each --- officers to billets, units to sectors: the \textbf{assignment problem} {\footnotesize(할당 문제)}
 \vspace{2pt}
@@ -317,7 +317,7 @@ directed graph $G = (V,E)$, \ $|V| = m$ nodes {\footnotesize(노드)}, arcs {\fo
 
 \textbf{node $i$}: \ $b_i$ = net supply = outflow $-$ inflow \qquad\quad
 \textbf{arc $(i,j)$}: \ cost $c_{ij}$, \ bounds $l_{ij} \le x_{ij} \le u_{ij}$ \quad
-\textbf{decision}: \ $x_{ij}$ = flow, in whole units
+\textbf{decision}: \ $x_{ij}$ = flow (whole units $\Rightarrow$ integer)
 \begin{center}
 \begin{tabular}{@{}l|l|l@{}}
  $b_i > 0$ & node $i$ supplies & \textbf{source} {\footnotesize(공급지)} \\[2pt]
@@ -394,7 +394,7 @@ sections 2 and 3 were the same model twice --- and both were networks
 \vspace{3pt}
 
 \textbf{the picture is not yet an instance}: nodes 3, 4 demand ($b_3 = -5$, $b_4 = -8$), so nodes 1, 2 must supply 13 ---
-\emph{which one, and how much, is not data.} that is the LAP
+\emph{which one, and how much, is not data.} that is the LAP \ ($f_1, f_2$ = opening costs, section 7)
 \end{board}
 \key{recognize an IP as a network and it is solved: one row per node, one column per arc, $\pm 1$ entries --- TU by construction, so the relaxation is free.}
 
@@ -404,8 +404,8 @@ sections 2 and 3 were the same model twice --- and both were networks
 transportation assumed the depots existed --- \emph{which depots should exist?} {\footnotesize(시설 입지 문제)}
 \vspace{2pt}
 
-\emph{watch the letters:} back to week 2's convention --- $x$ = integer (open or not), $y$ = continuous (tons).
-the flow is no longer the integer decision
+\emph{watch the letters:} back to week 2's convention --- $x$ = integer (open or not), $y$ = continuous.
+relief tons are divisible, so the flow is no longer the integer decision
 \vspace{2pt}
 
 $x_i = 1$ iff depot $i$ opens, \ $f_i$ = fixed opening cost, \ $y_{ij}$ = tons shipped
@@ -423,14 +423,14 @@ $x_i = 0 \Rightarrow y_{ij} = 0$; \ $x_i = 1$ releases it --- \emph{un}capacitat
 \vspace{1pt}
 
 \quad \emph{how big is $M$?} \ $y_{ij} \le d_j$ always $\Rightarrow$ $M = d_j$, smallest valid. \
-$M = \sum_j d_j$: valid, but 5 points of bound lost on section 6's network
+$M = \sum_j d_j$: valid, but on section 6's network the LP bound drops $52 \to 47$
 \vspace{3pt}
 
 \textbf{1. fix $x$} $\Rightarrow$ transportation falls out: \emph{all the hardness is in the binaries}
 \vspace{2pt}
 
 \textbf{2. big-$M$ costs the guarantee:} $y_{ij} \le M x_i$ belongs to no incidence matrix $\Rightarrow$ MCNF's proposition is
-gone. \ (not yet proof the LP lies --- trap 1. section 8 checks)
+gone. \ (not TU $\ne$ the LP lies: only \emph{some} $b$ must go fractional. section 8 checks)
 \end{board}
 \key{every guarantee in this note is a property of $A$ --- so every one is a single modeling decision away from being lost.}
 
@@ -441,7 +441,7 @@ MCNF takes $b_i$ as data; the \textbf{location--allocation problem} {\footnotesi
 \vspace{2pt}
 
 $r_i \ge 0$ = reserve held at $i$ (cost $h_i$/ton), \quad $q_i \ge 0$ = unmet demand (penalty $u_i$), \quad
-$s_i \ge 0$ = surplus (penalty $o_i$)
+$s_i \ge 0$ = surplus (penalty $o_i$; not section 3's supply)
 \[
   b_i \;=\; \underbrace{r_i}_{\text{decision}} - \; d_i + q_i - s_i
   \qquad\Longrightarrow\qquad
@@ -482,10 +482,10 @@ section 6's network, priced --- $S = \{1,2\}$, $B = 15$, $p = 1$, $h_i = 1$, $u_
     & y_{13} + y_{23} - y_{34} + q_3 - s_3 = 5 && \text{[node 3]} \\
     & y_{34} + y_{14} + q_4 - s_4 = 8 && \text{[node 4]} \\
     & r_1 + r_2 \le 15, \qquad r_1 \le 15 x_1, \qquad r_2 \le 15 x_2, \qquad x_1 + x_2 \le 1 \\
-    & y, r, s \ge 0, \quad 0 \le q_3 \le 5, \quad 0 \le q_4 \le 8, \quad x_1, x_2 \in \{0,1\}
+    & y, r, s \ge 0, \quad q_1 = q_2 = 0, \quad 0 \le q_3 \le 5, \quad 0 \le q_4 \le 8, \quad x_1, x_2 \in \{0,1\}
 \end{aligned}
 \]
-sixteen variables, two binary ($q_1 = q_2 = 0$ forced, so fourteen move). \ at $p = 1$, two plans:
+sixteen variables, two binary ($q_1 = q_2 = 0$ since $d_1 = d_2 = 0$, so fourteen move). \ at $p = 1$, two plans:
 \begin{center}
 \begin{tabular}{@{}l|c|c|l|c@{}}
  plan & open & hold & ship & total \\ \hline
@@ -507,8 +507,8 @@ site 2 ships cheaper and still loses: $-5$ on the road, $+10$ at the door
   z_{\mathrm{LP}} = 62 \ \ < \ \ z_{\mathrm{IP}} = 65,
   \qquad x_1 = \tfrac{8}{15}, \ \ x_2 = \tfrac13, \ \ r_1 = 8, \ \ r_2 = 5
 \]
-\quad half-open depots: open $10 \cdot \tfrac{8}{15} + 20 \cdot \tfrac13 = 12$, hold 13, ship 37 from \emph{both} sites
-(no single depot can) $\Rightarrow$ 62. \ section 1's gap, on our own toy
+\quad half-open depots: open for $10 \cdot \tfrac{8}{15} + 20 \cdot \tfrac13 = 12$, hold 13, ship 37 --- site 2's road bill
+without site 2's door $\Rightarrow$ 62. \ section 1's gap, on our own toy
 \end{board}
 \demo{lap\_app.py}{the model on a map --- drag \texttt{training data} to 1 and the dashboard collapses to today's single-scenario model (above 1 it is week 9's). \texttt{max facilities} is $p$; prices are \texttt{budget B} $= B$, \texttt{facility cost c} $= f_i$, \texttt{reserve cost f} $= h_i$ --- the app's letters do not match ours. \emph{Solve} picks the plan, \emph{Simulate disaster} routes it.}
 \takeaway{LAP $=$ MCNF $+$ two decisions MCNF cannot make: \emph{which} nodes supply ($x_i$) and \emph{how much} ($r_i$). fix those and a flow problem is all that is left --- TU, easy. all the hardness is in $(x,r)$.}
