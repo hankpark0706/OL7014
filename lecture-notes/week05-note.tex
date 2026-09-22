@@ -19,7 +19,8 @@
 \usepackage{graphicx}
 \usepackage{array}
 \usepackage{tikz}
-\usepackage{kotex}
+\usetikzlibrary{matrix, decorations.pathreplacing}
+\usepackage{needspace}
 \usepackage[hidelinks]{hyperref}
 
 \definecolor{ruleink}{RGB}{18, 68, 140}
@@ -30,6 +31,7 @@
 
 \setlength{\parindent}{0pt}
 \pagestyle{empty}
+\frenchspacing
 
 % tighter spacing around centered displays
 \AtBeginDocument{%
@@ -40,7 +42,7 @@
 
 % ---- one section -----------------------------------------------------------
 \newcommand{\beat}[2]{%   number, title
-  \par\medskip
+  \par\medskip\needspace{8\baselineskip}%   never strand a title at the page foot
   {\color{ruleink}\rule{\textwidth}{1pt}}\par\nobreak\vspace{2pt}
   {\large\bfseries #1.\; #2}\par\nobreak\vspace{3pt}}
 
@@ -51,7 +53,7 @@
   \par\endgroup\vspace{2pt}}
 
 % ---- highlights ------------------------------------------------------------
-\newcommand{\demo}[2]{\par{\color{demoink}\small\textbf{demo}\quad\texttt{#1} --- #2}\par}
+\newcommand{\demo}[2]{\par{\leavevmode\color{demoink}\small\textbf{demo}\quad\texttt{#1} --- #2}\par}
 \newcommand{\watch}[1]{\par{\color{watchink}\small\textbf{watch}\quad #1}\par}
 \newcommand{\key}[1]{\par\vspace{1pt}{\color{keyink}\small\textbf{KEY}\quad\textbf{#1}}\par}
 \newcommand{\takeaway}[1]{%
@@ -60,7 +62,7 @@
 
 \begin{document}
 
-{\Large\bfseries Week 5 --- Classic IP Models, Networks, and the LAP}\\[2pt]
+{\Large\bfseries Week 5 --- Classic IP Models and Networks}\\[2pt]
 {\small OL7014 Integer Programming \quad\textbullet\quad Instructor: Prof.\ H.\ Park \quad\textbullet\quad Week of Sep 21, 2026}
 
 % ---------------------------------------------------------------- 1
@@ -76,31 +78,22 @@ larger feasible set $\Rightarrow$ always optimistic: \qquad
 $z_{\mathrm{LP}} \ge z_{\mathrm{IP}}$ \ (max), \qquad $z_{\mathrm{LP}} \le z_{\mathrm{IP}}$ \ (min)
 \vspace{3pt}
 
-week 2: \ $22.5 \ge 19$ on the toy, rounding worth only $18$ --- a \textbf{bound}, not an answer. bounds solve every IP (week 7)
-\vspace{3pt}
-
-\textbf{today: when is the gap zero?}
-\vspace{2pt}
-
-\quad gap $= 0$ $\Rightarrow$ write $x \in \mathbb{Z}$, solve the relaxation, get an integer plan anyway --- \emph{the LP \textbf{is} the IP}
-\vspace{1pt}
-
-\quad not luck, not rounding: a whole family (assignment, transportation, networks), readable off $A$
+\textbf{today: when $z_{\mathrm{LP}} = z_{\mathrm{IP}}$?}
 \end{board}
 \key{one line, $\in \mathbb{Z}$, is what makes an IP hard --- so a model where deleting it costs nothing is worth recognizing on sight.}
 
 % ---------------------------------------------------------------- 2
-\beat{2}{Assignment --- a model born canonical}
-\demo{ip-games / assignment}{play FIRST: four cadets, four branches, one each --- the board below is the same model at $n = 3$. \ \url{https://hankpark0706.github.io/ip-games/assignment-matching.html}}
+\beat{2}{Assignment Problem}
+\demo{ip-games / assignment}{\url{https://hankpark0706.github.io/ip-games/assignment-matching.html}}
 \begin{board}
-3 pilots, 3 aircraft, one each --- officers to billets, units to sectors: the \textbf{assignment problem} {\footnotesize(할당 문제)}
+4 cadets (A--D), 4 branches (Army, Navy, Air Force, Marines), one each --- also officers to billets, units to sectors: the \textbf{assignment problem}
 \vspace{2pt}
 
-$c_{ij}$ = value of pairing $(i,j)$; \ the decision is a \emph{table}: \quad
-$X \in \{0,1\}^{3\times 3}$, \quad $x_{ij} = 1$ iff pilot $i$ flies aircraft $j$
+$c_{ij}$ = fit score of cadet $i$ in branch $j$ (the game's 1--5 table); \ the decision is a \emph{table}: \quad
+$X \in \{0,1\}^{4\times 4}$, \quad $x_{ij} = 1$ iff cadet $i$ takes branch $j$
 \vspace{2pt}
 
-rows sum to 1 (each pilot once), columns sum to 1 (each aircraft once) --- week 2's BP:
+rows sum to 1 (each cadet once), columns sum to 1 (each branch once) --- week 2's BP:
 \[
 \begin{aligned}
   \max_X\quad & \langle C, X \rangle \\
@@ -111,67 +104,124 @@ rows sum to 1 (each pilot once), columns sum to 1 (each aircraft once) --- week 
 \emph{read the symbols:} \ $\langle C, X \rangle = \sum_{i,j} c_{ij} x_{ij}$, \quad $\mathbf{1}$ = all-ones vector
 \vspace{2pt}
 
-\textbf{flatten}: $x = \operatorname{vec}(X) \in \mathbb{R}^9$ \ $\Rightarrow$ \ $A$ is $6 \times 9$, all 0/1, \ $b = \mathbf{1}$
+\textbf{canonical form} (week 2), \ 3 cadets (A, B, C), 3 branches (Army, Navy, Air Force) --- flatten $X$ row by row:
 \vspace{1pt}
 
-\quad \textbullet\ each column: exactly \textbf{two ones} --- one pilot row, one aircraft row \ (an \emph{incidence matrix})
-\vspace{1pt}
-
-\quad \textbullet\ $\operatorname{rank} A = 5$: any one row is implied by the rest
-\vspace{3pt}
-
-\textbf{relax} (section 1): \ $x_{ij} \in \{0,1\} \to x_{ij} \ge 0$ (row sums already cap at 1)
-\ $\Rightarrow$ \ the LP returns a \textbf{matching}, every cost table, every time
+\quad $x = \operatorname{vec}(X) = (x_{11}, x_{12}, x_{13}, \, x_{21}, x_{22}, x_{23}, \, x_{31}, x_{32}, x_{33})$, \quad $c = \operatorname{vec}(C)$
+\[
+  \max_x \ c^{\top}x \quad \text{s.t.} \quad Ax = b, \ \ x \in \{0,1\}^{9}
+\]
+\begin{center}\small
+\setlength{\arraycolsep}{2.6pt}\renewcommand{\arraystretch}{0.92}%
+$A = \left(\begin{array}{@{}ccc|ccc|ccc@{}}
+ 1&1&1 & 0&0&0 & 0&0&0 \\
+ 0&0&0 & 1&1&1 & 0&0&0 \\
+ 0&0&0 & 0&0&0 & 1&1&1 \\ \hline
+ 1&0&0 & 1&0&0 & 1&0&0 \\
+ 0&1&0 & 0&1&0 & 0&1&0 \\
+ 0&0&1 & 0&0&1 & 0&0&1
+\end{array}\right)
+\qquad
+b = \left(\begin{array}{@{}c@{}} 1\\ 1\\ 1\\ \hline 1\\ 1\\ 1 \end{array}\right)
+\qquad
+\begin{array}{@{}l@{}}
+ \text{\scriptsize cadet A once} \\ \text{\scriptsize cadet B once} \\ \text{\scriptsize cadet C once} \\ \noalign{\vskip\arrayrulewidth}
+ \text{\scriptsize Army filled once} \\ \text{\scriptsize Navy filled once} \\ \text{\scriptsize Air Force filled once}
+\end{array}$
+\end{center}
+\quad $A$ is $2n \times n^2$ --- one row per constraint, one column per (cadet, branch) pair: \ here $6 \times 9$, the game $8 \times 16$
 \end{board}
 \begin{center}
 \begin{tikzpicture}[scale=0.62, font=\tiny, >=stealth]
-  \foreach \i/\y in {1/2.0, 2/1.0, 3/0.0} {
-    \node[circle, draw, fill=blue!10, inner sep=1.4pt] (p\i) at (0,\y) {$\i$};
-    \node[circle, draw, fill=red!10, inner sep=1.4pt] (a\i) at (2.4,\y) {$\i$};}
-  \node[font=\tiny] at (0,2.6) {pilots}; \node[font=\tiny] at (2.4,2.6) {aircraft};
-  \foreach \i in {1,2,3} { \foreach \j in {1,2,3} { \draw[gray!45] (p\i) -- (a\j); } }
-  \draw[very thick, blue!65!black] (p1) -- (a2);
-  \draw[very thick, blue!65!black] (p2) -- (a3);
-  \draw[very thick, blue!65!black] (p3) -- (a1);
-  \node[align=center] at (1.2,-1.2) {a \textbf{matching}: one edge per pilot,\\ one edge per aircraft};
+  \foreach \i/\c/\y in {1/A/2.4, 2/B/1.6, 3/C/0.8, 4/D/0.0}
+    \node[circle, draw, fill=blue!10, inner sep=1.4pt, minimum size=4mm] (p\i) at (0,\y) {\c};
+  \foreach \j/\b/\y in {1/Army/2.4, 2/Navy/1.6, 3/Air Force/0.8, 4/Marines/0.0} {
+    \node[circle, draw, fill=red!10, inner sep=1.4pt, minimum size=4mm] (a\j) at (2.4,\y) {$\j$};
+    \node[anchor=west] at (2.75,\y) {\b};}
+  \node[font=\tiny] at (0,3.0) {cadets}; \node[font=\tiny] at (2.4,3.0) {branches};
+  \foreach \i in {1,2,3,4} { \foreach \j in {1,2,3,4} { \draw[gray!45] (p\i) -- (a\j); } }
+  \draw[very thick, blue!65!black] (p1) -- (a4);
+  \draw[very thick, blue!65!black] (p2) -- (a1);
+  \draw[very thick, blue!65!black] (p3) -- (a3);
+  \draw[very thick, blue!65!black] (p4) -- (a2);
+  \node[align=center] at (1.6,-1.2) {a \textbf{matching}: one edge per cadet,\\ one edge per branch};
 \end{tikzpicture}
 \hspace{12mm}
 \begin{tikzpicture}[scale=0.62, font=\tiny]
-  \node[anchor=west, align=left] at (0,1.5) {column $(i,j)$ of $A$ \ $=$ \ $e_i + e_{3+j}$};
+  \node[anchor=west, align=left] at (0,1.5) {column $(i,j)$ of $A$ \ $=$ \ $e_i + e_{4+j}$};
   \node[anchor=west] at (0,0.2)
-    {$\underbrace{0 \ \ 1 \ \ 0}_{\text{pilot rows}} \ \ \underbrace{0 \ \ 0 \ \ 1}_{\text{aircraft rows}}$
-     \ \ $\leftarrow$ \ column $(2,3)$};
-  \node[align=center] at (1.9,-1.2) {two ones, one in each block ---\\ the two sides of a \textbf{bipartite} graph};
+    {$\underbrace{0 \ \ 1 \ \ 0 \ \ 0}_{\text{cadet rows}} \ \ \underbrace{0 \ \ 0 \ \ 1 \ \ 0}_{\text{branch rows}}$
+     \ \ $\leftarrow$ \ column (B, Air Force)};
+  \node[align=center] at (2.3,-1.2) {two ones, one in each block ---\\ the two sides of a \textbf{bipartite} graph};
 \end{tikzpicture}
 \end{center}
-\key{$2n$ rows, $n^2$ binaries, harder-looking than week 1's two-row toy --- and the gap is \emph{zero}.}
+\key{the LP relaxation gives the same solution as the IP --- why?}
 \takeaway{delete assignment's integrality line and the answer does not move. the reason has a name --- \emph{total unimodularity} --- coming up.}
 
 % ---------------------------------------------------------------- 3
-\beat{3}{Transportation --- assignment with quantities}
+\beat{3}{Transportation Problem}
+\demo{ip-games / transportation}{two facilities, three divisions --- the $2 \times 3$ case below. \ \url{https://hankpark0706.github.io/ip-games/transportation.html}}
 \begin{board}
 supply $s_i$ at source $i$, demand $d_j$ at sink $j$ (assignment: all $= 1$) \ $\Rightarrow$ \ matching becomes \textbf{flow}
 \vspace{2pt}
 
-$x_{ij}$ = amount shipped $i \to j$ --- crates, pallets, sorties: whole units, so integrality is declared
+$x_{ij}$ = amount shipped $i \to j$
 \[
 \begin{aligned}
   \min_{x}\quad & \textstyle\sum_{i=1}^{n} \sum_{j=1}^{k} c_{ij}\, x_{ij} \\
   \text{s.t.}\quad
-    & \textstyle\sum_{j=1}^{k} x_{ij} \le s_i && (i \in [n]) && \text{ship no more than you hold \ \footnotesize(공급 한도)} \\
-    & \textstyle\sum_{i=1}^{n} x_{ij} \ge d_j && (j \in [k]) && \text{every sink gets what it needs \ \footnotesize(수요 충족)} \\
+    & \textstyle\sum_{j=1}^{k} x_{ij} \le s_i && (i \in [n]) && \text{ship no more than you hold} \\
+    & \textstyle\sum_{i=1}^{n} x_{ij} \ge d_j && (j \in [k]) && \text{every sink gets what it needs} \\
     & x_{ij} \in \mathbb{Z}_{+}
 \end{aligned}
 \]
-\textbf{balanced}: \ $\sum_i s_i = \sum_j d_j$ \qquad
-with $c \ge 0$ nobody ships spare, so the $\ge d_j$ rows may be written $=$
+\begin{center}\small
+\setlength{\arraycolsep}{2.6pt}\renewcommand{\arraystretch}{0.92}%
+$A = \left(\begin{array}{@{}ccc|ccc@{}}
+ 1&1&1 & 0&0&0 \\
+ 0&0&0 & 1&1&1 \\ \hline
+ 1&0&0 & 1&0&0 \\
+ 0&1&0 & 0&1&0 \\
+ 0&0&1 & 0&0&1
+\end{array}\right)
+\qquad
+b = \left(\begin{array}{@{}c@{}} s_1\\ s_2\\ \hline d_1\\ d_2\\ d_3 \end{array}\right)
+\qquad
+\begin{array}{@{}l@{}}
+ \text{\scriptsize facility A ships $s_1$} \\ \text{\scriptsize facility B ships $s_2$} \\ \noalign{\vskip\arrayrulewidth}
+ \text{\scriptsize division 1 gets $d_1$} \\ \text{\scriptsize division 2 gets $d_2$} \\ \text{\scriptsize division 3 gets $d_3$}
+\end{array}$
+\hspace{10mm}
+\begin{tikzpicture}[baseline=(current bounding box.center), scale=0.8, font=\tiny, >=stealth,
+    cost/.style={fill=white, draw=gray!60, rounded corners=1.5pt, inner sep=0.8pt},
+    ship/.style={fill=white, draw=blue!65!black, rounded corners=1.5pt, inner sep=0.8pt, text=blue!65!black, font=\tiny\bfseries}]
+  \foreach \s/\y/\sup in {A/2.55/5, B/0.85/7} {
+    \node[circle, draw, fill=green!15, inner sep=1.4pt, minimum size=4mm] (s\s) at (0,\y) {\s};
+    \node[anchor=east, align=right] at (-0.35,\y) {Facility \s\\ supply \sup};}
+  \foreach \j/\y/\dem in {1/3.4/6, 2/1.7/2, 3/0.0/4} {
+    \node[circle, draw, fill=red!12, inner sep=1.4pt, minimum size=4mm] (d\j) at (5.6,\y) {$\j$};
+    \node[anchor=west, align=left] at (5.95,\y) {Div \j\\ demand \dem};}
+  % every road, then the cheapest plan on top in blue
+  \foreach \s in {A,B} { \foreach \j in {1,2,3} { \draw[->, gray!55] (s\s) -- (d\j); } }
+  \foreach \s/\j in {A/1, A/2, B/1, B/3}
+    \draw[->, very thick, blue!65!black] (s\s) -- (d\j);
+  % tags, hand-placed along each road to clear the crossings
+  \foreach \s/\j/\c/\p in {A/1/4/0.55, A/2/5/0.25, A/3/9/0.72, B/1/3/0.72, B/2/6/0.25, B/3/6/0.55}
+    \path (s\s) -- node[pos=\p, cost] {$c{=}\c$} (d\j);
+  \foreach \s/\j/\x/\p in {A/1/3/0.3, A/2/2/0.7, B/1/3/0.6, B/3/4/0.25}
+    \path (s\s) -- node[pos=\p, ship] {\x} (d\j);
+  \node[align=center] at (2.8,-0.95) {the game's board: \ $b = (5, 7, 6, 2, 4)$\\
+    {\color{blue!65!black}blue}: the cheapest plan, amounts shipped ---
+    $3 \cdot 4 + 2 \cdot 5 + 3 \cdot 3 + 4 \cdot 6 = 55$};
+\end{tikzpicture}
+\end{center}
+\quad assignment's pattern, now $(n + k) \times nk = 5 \times 6$ --- only $b$ changed: $s, d$ in place of $\mathbf{1}$
 \vspace{3pt}
 
-\textbf{relax}: \ $x_{ij} \in \mathbb{Z}_{+} \to x_{ij} \ge 0$ \ $\Rightarrow$ \ integer $s, d$ give whole shipments back.
-\ gap zero again --- and not a binary in sight
+\textbf{relax}: \ $x_{ij} \in \mathbb{Z}_{+} \to x_{ij} \ge 0$
 \vspace{2pt}
 
-\quad assignment is the special case $k = n$, \ $s_i = d_j = 1$: row sums cap $x_{ij}$ at 1, and section 4 puts the
+\quad \textbf{assignment is the special case of transportation problem}: $k = n$, \ $s_i = d_j = 1$ --- row sums cap $x_{ij}$ at 1, and section 4 puts the
 optimum on a \emph{corner} --- a permutation matrix
 \end{board}
 \takeaway{transportation = assignment with quantities: supplies left, demands right, flows between. an IP you may hand to an LP solver whenever the data is whole.}
@@ -179,20 +229,40 @@ optimum on a \emph{corner} --- a permutation matrix
 % ---------------------------------------------------------------- 4
 \beat{4}{Total unimodularity --- why the LP told the truth}
 \begin{board}
-gap on week 1's toy: $22.5 - 19$. \ gap on assignment, transportation: $0$. \ same solver $\Rightarrow$ the difference is in the \emph{matrix}
+gap on week 1's toy: $22.5 - 19$. \ gap on assignment, transportation: $0$. \ same solver $\Rightarrow$ the difference is in the \emph{matrix}%
 \vspace{3pt}
 
-\textbf{Def.} \ $A$ is \textbf{totally unimodular (TU)} {\footnotesize(완전 유니모듈러 행렬)}: every square submatrix has
+\textbf{Def.} \ $A$ is \textbf{totally unimodular (TU)}: every square submatrix has
 determinant $0$, $+1$, or~$-1$
 \vspace{1pt}
 
 \quad (any $k$ rows $\times$ any $k$ columns, every $k$) \quad --- a property of $A$ alone: no $b$, no $c$
 \vspace{3pt}
 
-\textbf{$k = 1$ is free:} \ a $1 \times 1$ submatrix is one entry \ $\Rightarrow$ \ \textbf{every entry of a TU matrix is $0, \pm 1$}
+\textbf{determinant}: \ $\det : \mathbb{R}^{n \times n} \to \mathbb{R}$ \ --- square matrix in, one number out
+\[
+  1 \times 1: \ \det(a) = a
+  \qquad\qquad
+  2 \times 2: \ \det\begin{pmatrix} a & b \\ c & d \end{pmatrix} = ad - bc
+\]
+\[
+  3 \times 3: \ \det\begin{pmatrix} a & b & c \\ d & e & f \\ g & h & i \end{pmatrix}
+  = a \det\begin{pmatrix} e & f \\ h & i \end{pmatrix}
+  - b \det\begin{pmatrix} d & f \\ g & i \end{pmatrix}
+  + c \det\begin{pmatrix} d & e \\ g & h \end{pmatrix}
+\]
+
+\quad $\det(8) = 8$, \ $\det(-1) = -1$ \qquad
+$\det\left(\begin{smallmatrix} 1 & 3 \\ 3 & 1 \end{smallmatrix}\right) = 1 \cdot 1 - 3 \cdot 3 = -8$ (week 1's toy), \quad
+$\det\left(\begin{smallmatrix} 1 & 1 \\ 0 & 1 \end{smallmatrix}\right) = 1 \cdot 1 - 1 \cdot 0 = 1$
 \vspace{1pt}
 
-\quad week 2's rucksack row $(5,7,8,8,8,2)$ has an 8 $\Rightarrow$ not~TU \quad (the numbers, not the shape: $\sum_i x_i \le p$ is TU)
+\quad $\det\left(\begin{smallmatrix} 1 & 1 & 0 \\ 0 & 1 & 1 \\ 1 & 0 & 1 \end{smallmatrix}\right)
+= 1\,(1 \cdot 1 - 1 \cdot 0) - 1\,(0 \cdot 1 - 1 \cdot 1) + 0 = 1 + 1 = 2$
+\quad --- entries all $0,1$, yet $\det = 2$: \textbf{not} TU
+\vspace{3pt}
+
+\textbf{$k = 1$ is free:} \ a $1 \times 1$ submatrix is one entry \ $\Rightarrow$ \ \textbf{every entry of a TU matrix is $0, \pm 1$}
 \vspace{3pt}
 
 \textbf{Prop.} (Hoffman--Kruskal) \ $A$ TU \textbf{and} $b$ integer \ $\Rightarrow$ \ every corner of
@@ -202,14 +272,15 @@ $P = \{x : Ax \le b, \ x \ge 0\}$ is integer (same for $Ax = b$)
 \quad $\Rightarrow$ \ the LP, if it has an optimum, has an \emph{integer} one: \ \textbf{the relaxation solves the IP}
 \vspace{3pt}
 
-\emph{mechanism}: in $Ax = b$, $x \ge 0$ a corner picks \emph{basic columns} $B$ (the rest are 0), and $A_B x_B = b$.
-Cramer:
-\[
-  (x_B)_j \;=\; \frac{\det(A_B \text{ with column } j \text{ replaced by } b)}{\det A_B}
-\]
-integer on top; \ $\det A_B = \pm 1$ \ $\Rightarrow$ \ no fraction can appear. \ ($\det = 0$: not a basis, never a corner)
+\textbf{Prop.} (TU-preserving; Wolsey, Ch.~3) \ $A$ is TU \ $\Leftrightarrow$ \ $\left(\begin{smallmatrix} A \\ I \end{smallmatrix}\right)$ is TU
+\vspace{1pt}
+
+\quad why: a row of $I$ holds a single $1$ --- expand the determinant along it, and what is left is $0$ or $\pm$ a smaller one
+\vspace{1pt}
+
+\quad so \textbf{bounds are free}: $x_j \le u_j$ is a row of $I$ --- the same kind of row as the $x \ge 0$ already inside $P$
 \end{board}
-\key{TU is the promise that \emph{no} corner can be fractional, whatever integer $b$ you throw at it.}
+\key{TU matrix $A$ and integer $b$ guarantee $z_{\mathrm{LP}} = z_{\mathrm{IP}}$.}
 
 % ---------------------------------------------------------------- 5
 \beat{5}{Recognizing it --- two dimensions, then the checklist}
@@ -220,10 +291,10 @@ week 1's objective $\max 4x + 5y$, \ $x,y \ge 0$, \ change \emph{nothing but} $A
   \qquad
   (P_1) \ \begin{cases} \phantom{-}x + y \le 5 \\ -x + y \le 2 \end{cases}
   \qquad
-  (P_2) \ \begin{cases} x + y \le 5 \\ \phantom{x + {}} y \le 2 \end{cases}
+  (P_2) \ \begin{cases} x + y \le 5 \\ \phantom{x + {}} y \le 3 \end{cases}
 \]
 $(P_0)$ = week 1's toy. \ $(P_1)$: two teams fly $\le 5$ sorties between them, B at most two \emph{more than} A.
-\ $(P_2)$: flat cap, B flies $\le 2$
+\ $(P_2)$: flat cap, B flies $\le 3$
 \vspace{3pt}
 
 \begin{center}
@@ -234,7 +305,7 @@ $(P_0)$ = week 1's toy. \ $(P_1)$: two teams fly $\le 5$ sorties between them, B
  $(P_1)$ & $\left(\begin{smallmatrix} 1 & 1 \\ -1 & 1 \end{smallmatrix}\right)$ &
    $2$ & no --- $\det = 2$ & $(1.5,\, 3.5)$, \ $23.5$ & $(2,3)$, \ $23$ \\[4pt]
  $(P_2)$ & $\left(\begin{smallmatrix} 1 & 1 \\ 0 & 1 \end{smallmatrix}\right)$ &
-   $1$ & \textbf{yes} & $(3,2)$, \ $22$ & $(3,2)$, \ $22$ \\
+   $1$ & \textbf{yes} & $(2,3)$, \ $23$ & $(2,3)$, \ $23$ \\
 \end{tabular}
 \end{center}
 \vspace{2pt}
@@ -261,13 +332,13 @@ $\det \left(\begin{smallmatrix} 1 & 1 \\ -1 & 1\end{smallmatrix}\right) = 2$ $\R
 \end{tikzpicture}
 \hspace{12mm}
 \begin{tikzpicture}[scale=0.6, font=\tiny]
-  \fill[blue!10] (0,0) -- (5,0) -- (3,2) -- (0,2) -- cycle;
-  \draw[thin,gray] (0,0) -- (5,0) -- (3,2) -- (0,2) -- cycle;
+  \fill[blue!10] (0,0) -- (5,0) -- (2,3) -- (0,3) -- cycle;
+  \draw[thin,gray] (0,0) -- (5,0) -- (2,3) -- (0,3) -- cycle;
   \draw[->] (0,0) -- (5.7,0) node[below] {$x$}; \draw[->] (0,0) -- (0,4.3) node[left] {$y$};
-  \foreach \p in {(0,0),(1,0),(2,0),(3,0),(4,0),(5,0),(0,1),(1,1),(2,1),(3,1),(4,1),(0,2),(1,2),(2,2),(3,2)}
+  \foreach \p in {(0,0),(1,0),(2,0),(3,0),(4,0),(5,0),(0,1),(1,1),(2,1),(3,1),(4,1),(0,2),(1,2),(2,2),(3,2),(0,3),(1,3),(2,3)}
     \fill[black!55] \p circle (1.7pt);
-  \fill[red!75!black] (3,2) circle (2.6pt);
-  \node[red!75!black, anchor=west] at (3.25,2.4) {LP $=$ IP $(3,2)$};
+  \fill[red!75!black] (2,3) circle (2.6pt);
+  \node[red!75!black, anchor=west] at (2.25,3.4) {LP $=$ IP $(2,3)$};
   \node[align=center] at (2.6,-1.2) {$(P_2)$: \ $\det = 1$, \textbf{TU}\\ every corner is a lattice point};
 \end{tikzpicture}
 \end{center}
@@ -287,32 +358,109 @@ $\det \left(\begin{smallmatrix} 1 & 1 \\ -1 & 1\end{smallmatrix}\right) = 2$ $\R
 \end{center}
 \vspace{2pt}
 
-two ways to pass (iii) --- the whole course:
-\vspace{2pt}
-
-\quad \textbullet\ \textbf{two $+1$s} (\emph{undirected} incidence): opposite sides $\Rightarrow$ $M_1, M_2$ = a
-\textbf{bipartition}. \ pilots / aircraft \textbf{are} $M_1$ / $M_2$
+\textbf{Prop.} \ two shapes always pass the checklist --- so they are TU:
 \vspace{1pt}
 
-\quad \textbullet\ \textbf{one $+1$, one $-1$} (\emph{directed} incidence): $M_1 = $ all rows, $M_2 = \emptyset$ ---
-any graph (section 6)
+\quad (a) every column holds one $+1$ and one $-1$ \quad --- (iii) with $M_1 =$ all rows, $M_2 = \emptyset$
+\vspace{1pt}
+
+\quad (b) rows in two blocks, every column holds one $1$ in each block \quad --- (iii) with $M_1 =$ top block, $M_2 =$ bottom
+\vspace{1pt}
+
+\quad two ones per column with no such blocks can fail: section 4's $3 \times 3$ has $\det = 2$
+\vspace{1pt}
+
+\quad $\Rightarrow$ assignment and transportation are shape (b), cadet/facility rows on top: \textbf{solve them as LPs}
+\end{board}
+
+% ---------------------------------------------------------------- 6
+\beat{6}{Graphs --- the notation every model from here on lives on}
+\begin{board}
+sections 2 and 3 used it without saying so; from here to week 12 every model is written on a graph
+\vspace{2pt}
+
+$G = (V, E)$: \ $V$ = a finite set of \textbf{nodes} (the \emph{things} --- assignment: cadets and branches;
+transportation: facilities and troops), \
+$E \subseteq V \times V$ = a set of \textbf{arcs} (the \emph{connections} --- a permitted pairing; a road)
+\vspace{1pt}
+
+\quad $|V| = m$ nodes $=$ rows of $A$; \quad $|E| = n$ arcs $=$ columns of $A$ --- \textbf{one decision $x_{ij}$ per arc}
 \begin{center}
 \begin{tabular}{@{}l|l|l@{}}
- model & matrix & LP relaxation \\ \hline
- week 1's toy $(P_0)$ & a row with a 3 in it & fractional corner $(2.5, 2.5)$ \\[2pt]
- assignment & bipartite incidence, TU & integral: the LP \emph{is} the IP \\[2pt]
- transportation & bipartite incidence, TU & integral whenever $s, d$ are \\
+ & an arc is & drawn as \\ \hline
+ \textbf{directed} & an ordered pair $(i,j)$: leaves $i$ (tail), enters $j$ (head); \ $(i,j) \ne (j,i)$ & arrow $i \to j$ \\[2pt]
+ \textbf{undirected} & a set $\{i,j\}$, no direction --- an \emph{edge} & line $i$ --- $j$ \\
 \end{tabular}
 \end{center}
 \end{board}
-\demo{demo1\_toy\_ip.py}{week 2's demo on week 1's toy: \texttt{r1}, \texttt{r2} move $b$ --- no slider moves $A$, and $A$ is where TU lives. at \texttt{r1} $=$ \texttt{r2} $= 4$ the LP does land on $(1,1)$: failing TU means \emph{some} integer $b$ gives fractions, not every one.}
-\takeaway{first time in this course that the \emph{shape} of $A$ --- not its size, not the solver --- decided whether a problem was easy.}
+\begin{center}
+\begin{tikzpicture}[>=stealth, font=\scriptsize, scale=0.8]
+  \node[circle, draw, fill=green!15, inner sep=1pt, minimum size=4.6mm] (a) at (0,1.4) {$1$};
+  \node[circle, draw, fill=green!15, inner sep=1pt, minimum size=4.6mm] (b) at (0,0.2) {$2$};
+  \node[circle, draw, fill=gray!15,  inner sep=1pt, minimum size=4.6mm] (c) at (1.6,0.8) {$3$};
+  \node[circle, draw, fill=red!12,   inner sep=1pt, minimum size=4.6mm] (d) at (3.2,0.8) {$4$};
+  \draw[->, gray!70] (a) -- (c); \draw[->, gray!70] (b) -- (c); \draw[->, gray!70] (c) -- (d);
+  \draw[->, gray!70] (a) to[bend left=28] (d);
+  \node[align=center, font=\tiny] at (1.6,-1.1) {\textbf{directed}: arrows --- $(1,3)$ leaves 1, enters 3\\ node 3 is a hub, flow in and out --- section 7};
+\end{tikzpicture}
+\hspace{12mm}
+\begin{tikzpicture}[font=\scriptsize, scale=0.8]
+  \node[circle, draw, fill=blue!8, inner sep=1pt, minimum size=4.6mm] (a) at (0,1.4) {$1$};
+  \node[circle, draw, fill=blue!8, inner sep=1pt, minimum size=4.6mm] (b) at (0,0.2) {$2$};
+  \node[circle, draw, fill=blue!8, inner sep=1pt, minimum size=4.6mm] (c) at (1.6,0.8) {$3$};
+  \node[circle, draw, fill=blue!8, inner sep=1pt, minimum size=4.6mm] (d) at (3.2,0.8) {$4$};
+  \draw[gray!70] (a) -- (c); \draw[gray!70] (b) -- (c); \draw[gray!70] (c) -- (d);
+  \draw[gray!70] (a) to[bend left=28] (d);
+  \node[align=center, font=\tiny] at (1.6,-1.1) {\textbf{undirected}: the same four nodes, lines --- $\{1,3\} = \{3,1\}$\\ a road with no one-way sign; no tail, no head, no hub};
+\end{tikzpicture}
+\end{center}
+\begin{board}
+\textbf{bipartite} --- a property of the \emph{node set}, not of an arc (a bipartite graph can be directed or not): \
+$V = L \cup R$, \ $L \cap R = \emptyset$, \ every arc joins $L$ to $R$ --- none inside $L$, none inside $R$. \ usually drawn as two columns, but the columns are not the definition
+\vspace{1pt}
 
-% ---------------------------------------------------------------- 6
-\beat{6}{Minimum cost network flow (MCNF) --- the family worth recognizing}
+\quad the graph above is \textbf{not} bipartite: $1 \to 3 \to 4$ and $1 \to 4$ make a triangle, and no two-way split of $\{1,3,4\}$ keeps every arc across
+\end{board}
+\begin{center}
+\begin{tikzpicture}[>=stealth, font=\scriptsize, scale=0.8]
+  \foreach \i/\y in {1/1.4, 2/0.2}
+    \node[circle, draw, fill=green!15, inner sep=1pt, minimum size=4.6mm] (l\i) at (0,\y) {$\i$};
+  \foreach \j/\y in {3/2.0, 4/0.8, 5/-0.4}
+    \node[circle, draw, fill=red!12, inner sep=1pt, minimum size=4.6mm] (r\j) at (2.6,\y) {$\j$};
+  \foreach \i in {1,2} \foreach \j in {3,4,5} \draw[->, gray!70] (l\i) -- (r\j);
+  \node[above] at (0,1.85) {$L$};  \node[above] at (2.6,2.35) {$R$};
+  \node[align=center, font=\tiny] at (1.3,-1.1) {\textbf{bipartite}: every arc $L \to R$\\ sections 2, 3 --- no hubs};
+\end{tikzpicture}
+\hspace{12mm}
+\begin{tikzpicture}[>=stealth, font=\scriptsize, scale=0.8]
+  \node[circle, draw, fill=red!12,   inner sep=1pt, minimum size=4.6mm] (r3) at (0,1.5) {$3$};
+  \node[circle, draw, fill=red!12,   inner sep=1pt, minimum size=4.6mm] (r5) at (0.5,-0.3) {$5$};
+  \node[circle, draw, fill=green!15, inner sep=1pt, minimum size=4.6mm] (l1) at (1.2,2.0) {$1$};
+  \node[circle, draw, fill=red!12,   inner sep=1pt, minimum size=4.6mm] (r4) at (1.8,0.5) {$4$};
+  \node[circle, draw, fill=green!15, inner sep=1pt, minimum size=4.6mm] (l2) at (3.0,1.1) {$2$};
+  \draw[->, gray!70] (l1) -- (r3); \draw[->, gray!70] (l1) -- (r4); \draw[->, gray!70] (l1) -- (r5);
+  \draw[->, gray!70] (l2) -- (r3); \draw[->, gray!70] (l2) -- (r4);
+  \draw[->, gray!70] (l2) to[bend left=28] (r5);
+  \node[align=center, font=\tiny] at (1.5,-1.1) {same six arcs, nodes shuffled: \textbf{still bipartite}\\ $L$, $R$ are the \emph{colors}, not the columns};
+\end{tikzpicture}
+\end{center}
+\begin{board}
+\textbf{the classics, read as graphs:}
+\begin{center}
+\begin{tabular}{@{}l|l|l|l|l@{}}
+ model & $L$ & $R$ & $E$ & $x_{ij}$ on arc $(i,j)$ \\ \hline
+ assignment (\S 2) & $n$ cadets & $n$ branches & every pair: $n^2$ arcs (the game: $16$) & $\{0,1\}$: paired or not \\[2pt]
+ transportation (\S 3) & $n$ facilities & $k$ divisions & every pair: $nk$ arcs (\S 3's arrows) & $\mathbb{Z}_{+}$: crates shipped \\
+\end{tabular}
+\end{center}
+\end{board}
+\key{a graph is two lists, nodes and arcs. a model on it is one row per node, one decision per arc --- sections 2 and 3 were bipartite graphs before the word appeared.}
+
+% ---------------------------------------------------------------- 7
+\beat{7}{Minimum cost network flow (MCNF) --- the family worth recognizing}
 \demo{ip-games / min-cost-flow}{push flow through a network by hand, then let the solver do it. \ \url{https://hankpark0706.github.io/ip-games/min-cost-network-flow.html}}
 \begin{board}
-directed graph $G = (V,E)$, \ $|V| = m$ nodes {\footnotesize(노드)}, arcs {\footnotesize(아크)} $(i,j) \in E$
+\textbf{MCNF drops the bipartite restriction}: \ any directed graph $G = (V,E)$, \ $|V| = m$ nodes, arcs $(i,j) \in E$
 \vspace{2pt}
 
 \textbf{node $i$}: \ $b_i$ = net supply = outflow $-$ inflow \qquad\quad
@@ -320,9 +468,9 @@ directed graph $G = (V,E)$, \ $|V| = m$ nodes {\footnotesize(노드)}, arcs {\fo
 \textbf{decision}: \ $x_{ij}$ = flow (whole units $\Rightarrow$ integer)
 \begin{center}
 \begin{tabular}{@{}l|l|l@{}}
- $b_i > 0$ & node $i$ supplies & \textbf{source} {\footnotesize(공급지)} \\[2pt]
- $b_i < 0$ & node $i$ demands & \textbf{destination} {\footnotesize(수요지)} \\[2pt]
- $b_i = 0$ & flow only passes through & \textbf{transhipment}, a hub {\footnotesize(환적지)} \\
+ $b_i > 0$ & node $i$ supplies & \textbf{source} \\[2pt]
+ $b_i < 0$ & node $i$ demands & \textbf{destination} \\[2pt]
+ $b_i = 0$ & flow only passes through & \textbf{transhipment}, a hub \\
 \end{tabular}
 \end{center}
 \[
@@ -330,50 +478,87 @@ directed graph $G = (V,E)$, \ $|V| = m$ nodes {\footnotesize(노드)}, arcs {\fo
   \min_{x}\quad & \textstyle\sum_{(i,j) \in E} c_{ij}\, x_{ij} \\
   \text{s.t.}\quad
     & \underbrace{\textstyle\sum_{j \,:\, (i,j) \in E} x_{ij} \;-\; \sum_{j \,:\, (j,i) \in E} x_{ji} \;=\; b_i}
-        _{\text{one row per node --- \textbf{flow conservation} (흐름 보존)}}
+        _{\text{one row per node --- \textbf{flow conservation}}}
       \quad (\forall i \in V) \\[4pt]
     & l_{ij} \le x_{ij} \le u_{ij}, \quad x_{ij} \in \mathbb{Z}_{+}
 \end{aligned}
 \]
-rows sum to zero $\Rightarrow$ $\sum_{i} b_i = 0$ required --- else add a zero-cost \textbf{dummy node}
-\vspace{2pt}
-
-\textbf{node--arc incidence matrix}: one row per node, one column per arc, $+1$ where the arc leaves, $-1$ where it arrives
 \end{board}
 \begin{center}
-\begin{tikzpicture}[>=stealth, thick, font=\footnotesize, scale=0.9]
-  \node[circle, draw, fill=green!15, minimum size=8mm] (n1) at (0, 1.5) {$1$};
-  \node[circle, draw, fill=green!15, minimum size=8mm] (n2) at (0, -0.6) {$2$};
-  \node[circle, draw, fill=red!12,  minimum size=8mm] (n3) at (3.2, 0.45) {$3$};
-  \node[circle, draw, fill=red!12,  minimum size=8mm] (n4) at (6.4, 0.45) {$4$};
-  \node[anchor=east, font=\scriptsize] at (-0.5, 1.5)  {$f_1 = 10$};
-  \node[anchor=east, font=\scriptsize] at (-0.5, -0.6) {$f_2 = 20$};
-  \node[anchor=north, font=\scriptsize] at (3.2, -0.05) {$d_3 = 5$};
-  \node[anchor=north, font=\scriptsize] at (6.4, -0.05) {$d_4 = 8$};
-  \draw[->] (n1) -- node[sloped, above, font=\scriptsize] {$c_{13} = 2$} (n3);
-  \draw[->] (n2) -- node[sloped, below, pos=0.45, font=\scriptsize] {$c_{23} = 1$} (n3);
-  \draw[->] (n3) -- node[above, font=\scriptsize] {$c_{34} = 3$} (n4);
-  \draw[->] (n1) to[bend left=26] node[above, font=\scriptsize] {$c_{14} = 4$} (n4);
-  \node[anchor=west] at (7.0, 0.45)
-    {$A = \begin{pmatrix}
-       +1 & 0 & 0 & +1 \\
-        0 & +1 & 0 & 0 \\
-       -1 & -1 & +1 & 0 \\
-        0 & 0 & -1 & -1
-     \end{pmatrix}$};
-  \node[anchor=west, align=left, font=\scriptsize] at (7.05, -1.25)
-    {rows $=$ nodes $1,2,3,4$\\ columns $=$ arcs $(1,3), (2,3), (3,4), (1,4)$};
+\begin{tikzpicture}[>=stealth, thick, font=\footnotesize, scale=0.85,
+    tag/.style={inner sep=1.2pt, font=\tiny}]
+  \node[circle, draw, fill=green!15, minimum size=7mm] (n1) at (0, 1.8)  {$1$};
+  \node[circle, draw, fill=green!15, minimum size=7mm] (n2) at (0, -1.2) {$2$};
+  \node[circle, draw, fill=gray!15,  minimum size=7mm] (n3) at (3.6, 0.3) {$3$};
+  \node[circle, draw, fill=red!12,   minimum size=7mm] (n4) at (7.2, 1.8)  {$4$};
+  \node[circle, draw, fill=red!12,   minimum size=7mm] (n5) at (7.2, -1.2) {$5$};
+  \node[anchor=east, align=right, font=\scriptsize] at (-0.45, 1.8)  {Alpha\\ $b_1 = +5$};
+  \node[anchor=east, align=right, font=\scriptsize] at (-0.45, -1.2) {Bravo\\ $b_2 = +7$};
+  \node[anchor=south, font=\scriptsize] at (3.6, 0.72) {hub, $b_3 = 0$};
+  \node[anchor=west, align=left, font=\scriptsize] at (7.65, 1.8)  {Division 1\\ $b_4 = -7$};
+  \node[anchor=west, align=left, font=\scriptsize] at (7.65, -1.2) {Division 2\\ $b_5 = -5$};
+  % each road: cost on one side, bounds on the other
+  \draw[->] (n1) -- node[tag, above] {$c_{14} = 6$}  node[tag, below] {$0 \le x_{14} \le 10$} (n4);
+  \draw[->] (n2) -- node[tag, above] {$c_{25} = 4$}  node[tag, below] {$0 \le x_{25} \le 4$}  (n5);
+  \draw[->] (n1) -- node[tag, sloped, above, pos=0.42] {$c_{13} = 7$} node[tag, sloped, below, pos=0.42] {$0 \le x_{13} \le 12$} (n3);
+  \draw[->] (n2) -- node[tag, sloped, above, pos=0.42] {$c_{23} = 2$} node[tag, sloped, below, pos=0.42] {$0 \le x_{23} \le 7$}  (n3);
+  \draw[->] (n3) -- node[tag, sloped, above, pos=0.58] {$c_{34} = 1$} node[tag, sloped, below, pos=0.58] {$0 \le x_{34} \le 9$}  (n4);
+  \draw[->] (n3) -- node[tag, sloped, above, pos=0.58] {$c_{35} = 5$} node[tag, sloped, below, pos=0.58] {$0 \le x_{35} \le 9$}  (n5);
+  \node[align=center, font=\scriptsize] at (4.0, -2.3)
+    {the game's map --- each road carries its cost per truckload and the bounds on its one decision};
+\end{tikzpicture}
+\end{center}
+\begin{center}
+\begin{tikzpicture}[font=\footnotesize]
+  \matrix (A) [matrix of math nodes, left delimiter={(}, right delimiter={)},
+               nodes={minimum width=6.5mm, inner sep=1.2pt}, row sep=0.4pt] {
+    +1 & +1 &  0 &  0 &  0 &  0 \\
+     0 &  0 & +1 & +1 &  0 &  0 \\
+    -1 &  0 & -1 &  0 & +1 & +1 \\
+     0 & -1 &  0 &  0 & -1 &  0 \\
+     0 &  0 &  0 & -1 &  0 & -1 \\
+     1 &  0 &  0 &  0 &  0 &  0 \\
+     0 &  1 &  0 &  0 &  0 &  0 \\
+     0 &  0 &  1 &  0 &  0 &  0 \\
+     0 &  0 &  0 &  1 &  0 &  0 \\
+     0 &  0 &  0 &  0 &  1 &  0 \\
+     0 &  0 &  0 &  0 &  0 &  1 \\
+  };
+  \draw[gray!60, dashed] (A-5-1.south west) -- (A-5-6.south east);
+  % column heads: one arc per column, on two lines
+  \foreach \j/\a in {1/{(1,3)}, 2/{(1,4)}, 3/{(2,3)}, 4/{(2,5)}, 5/{(3,4)}, 6/{(3,5)}}
+    \node[above, font=\tiny, align=center, inner sep=1pt] at (A-1-\j.north) {arc\\ $\a$};
+  % row heads: five nodes, then one capacity row per arc
+  \foreach \i in {1,...,5}
+    \node[anchor=east, font=\tiny, xshift=-7pt] at (A-\i-1.west -| A.west) {node \i};
+  \foreach \i/\a in {6/{(1,3)}, 7/{(1,4)}, 8/{(2,3)}, 9/{(2,5)}, 10/{(3,4)}, 11/{(3,5)}}
+    \node[anchor=east, font=\tiny, xshift=-7pt] at (A-\i-1.west -| A.west) {capacity $\a$};
+  % right-hand sides: = b on the node rows, <= u on the capacity rows
+  \foreach \i/\r in {1/{= 5}, 2/{= 7}, 3/{= 0}, 4/{= -7}, 5/{= -5},
+                     6/{\le 12}, 7/{\le 10}, 8/{\le 7}, 9/{\le 4}, 10/{\le 9}, 11/{\le 9}}
+    \node[anchor=west, xshift=7pt] at (A-\i-6.east -| A.east) {$\r$};
+  % block labels: node rows = A (the incidence matrix), capacity rows = I
+  \draw[decorate, decoration={brace, amplitude=4pt}, thick]
+    ([xshift=48pt]A-1-6.north east) -- ([xshift=48pt]A-5-6.south east)
+    node[midway, right=5pt] {$A$ \ \scriptsize incidence matrix, $= b$};
+  \draw[decorate, decoration={brace, amplitude=4pt}, thick]
+    ([xshift=48pt]A-6-6.north east) -- ([xshift=48pt]A-11-6.south east)
+    node[midway, right=5pt] {$I$ \ \scriptsize capacities, $\le u$};
+  \node[anchor=east, xshift=-64pt] at (A.west) {$\begin{pmatrix} A \\ I \end{pmatrix} =$};
 \end{tikzpicture}
 \end{center}
 \begin{board}
-checklist: \ (i) entries $0,\pm 1$ \checkmark \quad (ii) two per column \checkmark \quad
-(iii) $M_1 = V$, $M_2 = \emptyset$ \checkmark \ --- \emph{every} directed graph passes
+\textbf{$A$ is TU} --- every column holds one $+1$ (tail) and one $-1$ (head): shape (a) of section 5's Prop
+\vspace{1pt}
+
+\quad \textbf{$\left(\begin{smallmatrix} A \\ I \end{smallmatrix}\right)$ is TU} --- section 4's Prop (TU-preserving): the capacity rows are $I$,
+so \emph{bounds are free}
 \vspace{1pt}
 
 \quad (undirected: two $+1$s need a bipartite split --- the \textbf{matching LP} is integral only on bipartite graphs)
 \vspace{1pt}
 
-\quad $\operatorname{rank} A = |V| - 1 = 3$: one conservation row is always redundant
+\quad $\operatorname{rank} A = |V| - 1 = 4$: one conservation row is always redundant (rows sum to zero)
 \vspace{3pt}
 
 \textbf{Prop.} \ integer $\{b_i\}$ and integer bounds $\{l_{ij}\}, \{u_{ij}\}$ \ $\Rightarrow$ \ every extreme point is
@@ -390,25 +575,22 @@ integral: delete $x \in \mathbb{Z}_{+}$, solve the LP, \textbf{no branching, eve
  max flow & all $b_i = 0$; add an artificial arc $(t,s)$ and maximize $x_{ts}$ \\
 \end{tabular}
 \end{center}
-sections 2 and 3 were the same model twice --- and both were networks
-\vspace{3pt}
-
-\textbf{the picture is not yet an instance}: nodes 3, 4 demand ($b_3 = -5$, $b_4 = -8$), so nodes 1, 2 must supply 13 ---
-\emph{which one, and how much, is not data.} that is the LAP \ ($f_1, f_2$ = opening costs, section 7)
+sections 2 and 3 were the same model twice --- both bipartite networks, the case with no hubs.
+\ the game is the first with a hub
 \end{board}
 \key{recognize an IP as a network and it is solved: one row per node, one column per arc, $\pm 1$ entries --- TU by construction, so the relaxation is free.}
 
-% ---------------------------------------------------------------- 7
-\beat{7}{Facility location --- paying to open}
+% ---------------------------------------------------------------- 8
+\beat{8}{Facility location --- paying to open}
 \begin{board}
-transportation assumed the depots existed --- \emph{which depots should exist?} {\footnotesize(시설 입지 문제)}
+transportation assumed the facilities existed --- \emph{which facilities should exist?}
 \vspace{2pt}
 
 \emph{watch the letters:} back to week 2's convention --- $x$ = integer (open or not), $y$ = continuous.
 relief tons are divisible, so the flow is no longer the integer decision
 \vspace{2pt}
 
-$x_i = 1$ iff depot $i$ opens, \ $f_i$ = fixed opening cost, \ $y_{ij}$ = tons shipped
+$x_i = 1$ iff facility $i$ opens, \ $f_i$ = fixed opening cost, \ $y_{ij}$ = tons shipped
 \[
 \begin{aligned}
   \min_{x,\,y}\quad & \textstyle\sum_{i} f_i x_i \;+\; \sum_{i} \sum_{j} c_{ij} y_{ij}
@@ -420,125 +602,51 @@ $x_i = 1$ iff depot $i$ opens, \ $f_i$ = fixed opening cost, \ $y_{ij}$ = tons s
 \end{aligned}
 \]
 $x_i = 0 \Rightarrow y_{ij} = 0$; \ $x_i = 1$ releases it --- \emph{un}capacitated
-\vspace{1pt}
-
-\quad \emph{how big is $M$?} \ $y_{ij} \le d_j$ always $\Rightarrow$ $M = d_j$, smallest valid. \
-$M = \sum_j d_j$: valid, but on section 6's network the LP bound drops $52 \to 47$
+\end{board}
+\begin{center}
+\begin{tikzpicture}[scale=0.8, font=\tiny, >=stealth,
+    sw/.style={draw, rounded corners=1.5pt, inner sep=1.5pt, fill=white}]
+  % facility A: switch on
+  \node[circle, draw, fill=green!15, inner sep=1.4pt, minimum size=4mm] (sA) at (0,2.55) {A};
+  \node[anchor=east, align=right] at (-0.35,2.55) {Facility A\\ $f_A = 10$};
+  \node[sw, draw=green!50!black, text=green!50!black, font=\tiny\bfseries] at (0,3.2) {$x_A = 1$ \ on};
+  % facility B: switch off --- node and roads fade
+  \node[circle, draw, dashed, gray!70, fill=gray!8, text=gray!70, inner sep=1.4pt, minimum size=4mm] (sB) at (0,0.85) {B};
+  \node[anchor=east, align=right, gray!70] at (-0.35,0.85) {Facility B\\ $f_B = 20$};
+  \node[sw, draw=gray!70, text=gray!70, font=\tiny\bfseries] at (0,0.2) {$x_B = 0$ \ off};
+  \foreach \j/\y/\dem in {1/3.4/6, 2/1.7/2, 3/0.0/4} {
+    \node[circle, draw, fill=red!12, inner sep=1.4pt, minimum size=4mm] (d\j) at (5.6,\y) {$\j$};
+    \node[anchor=west, align=left] at (5.95,\y) {Div \j\\ demand \dem};}
+  \foreach \j in {1,2,3} { \draw[->, thick, blue!65!black] (sA) -- (d\j); }
+  \foreach \j in {1,2,3} { \draw[->, dashed, gray!55] (sB) -- (d\j); }
+  \foreach \j/\p in {1/0.55, 2/0.35, 3/0.7}
+    \path (sA) -- node[pos=\p, fill=white, inner sep=0.8pt, text=blue!65!black] {$y_{A\j} \le M$} (d\j);
+  \foreach \j/\p in {1/0.72, 2/0.35, 3/0.55}
+    \path (sB) -- node[pos=\p, fill=white, inner sep=0.8pt, text=gray!70] {$y_{B\j} \le 0$} (d\j);
+  \node[align=center] at (2.8,-0.95) {section 3's graph, nothing added but a \textbf{switch} $x_i \in \{0,1\}$ on each facility, price $f_i$\\
+    B off $\Rightarrow$ $y_{Bj} \le M \cdot 0$: its three roads carry nothing --- the linking row \emph{is} the switch};
+\end{tikzpicture}
+\end{center}
+\begin{board}
+\emph{how big is $M$?} \ $y_{ij} \le d_j$ always $\Rightarrow$ $M = d_j$, smallest valid. \
+$M = \sum_j d_j$: also valid, but looser --- the LP bound sags with it (week 2: the \emph{smallest} valid $M$)
 \vspace{3pt}
 
 \textbf{1. fix $x$} $\Rightarrow$ transportation falls out: \emph{all the hardness is in the binaries}
 \vspace{2pt}
 
 \textbf{2. big-$M$ costs the guarantee:} $y_{ij} \le M x_i$ belongs to no incidence matrix $\Rightarrow$ MCNF's proposition is
-gone. \ (not TU $\ne$ the LP lies: only \emph{some} $b$ must go fractional. section 8 checks)
+gone. \ (not TU $\ne$ the LP lies: only \emph{some} $b$ must go fractional. week 6 checks)
 \end{board}
 \key{every guarantee in this note is a property of $A$ --- so every one is a single modeling decision away from being lost.}
-
-% ---------------------------------------------------------------- 8
-\beat{8}{The LAP --- when $b$ is a decision}
-\begin{board}
-MCNF takes $b_i$ as data; the \textbf{location--allocation problem} {\footnotesize(입지-배분 문제)} chooses it
-\vspace{2pt}
-
-$r_i \ge 0$ = reserve held at $i$ (cost $h_i$/ton), \quad $q_i \ge 0$ = unmet demand (penalty $u_i$), \quad
-$s_i \ge 0$ = surplus (penalty $o_i$; not section 3's supply)
-\[
-  b_i \;=\; \underbrace{r_i}_{\text{decision}} - \; d_i + q_i - s_i
-  \qquad\Longrightarrow\qquad
-  \underbrace{\textstyle\sum_{j} y_{ji} - \sum_{j} y_{ij}}_{\text{inflow} \,-\, \text{outflow}}
-  \;+\; r_i + q_i - s_i \;=\; d_i \quad (\forall i \in V)
-\]
-\[
-\begin{aligned}
-  \min_{x,\,r,\,y,\,q,\,s}\quad
-    & \textstyle\sum_{i} f_i x_i + \sum_{i} h_i r_i + \sum_{(i,j) \in E} c_{ij} y_{ij}
-      + \sum_{i} u_i q_i + \sum_{i} o_i s_i \\
-  \text{s.t.}\quad
-    & \textstyle\sum_{j} y_{ji} - \sum_{j} y_{ij} + r_i + q_i - s_i = d_i && (\forall i) && \text{[conservation --- MCNF]} \\
-    & \textstyle\sum_{i \in S} r_i \le B && && \text{[budget --- a knapsack row]} \\
-    & r_i \le B\, x_i && (\forall i \in S) && \text{[linking --- week 2]} \\
-    & \textstyle\sum_{i \in S} x_i \le p && && \text{[at most $p$ depots --- week 2]} \\
-    & y, r, s \ge 0, \quad 0 \le q_i \le d_i, \quad x_i \in \{0,1\}
-\end{aligned}
-\]
-five costs: open ($f_i$), hold ($h_i$), ship ($c_{ij}$), fail ($u_i$), waste ($o_i$). \ every constraint is old
-\vspace{1pt}
-
-\quad $S \subseteq V$ = \textbf{candidate sites}; elsewhere $x_i = r_i = 0$ --- no reserve inside the disaster area
-\vspace{1pt}
-
-\quad $M = B$ passes, since the budget row already caps each $r_i$ at $B$ --- valid, though week 2 would ask for the
-\emph{smallest} valid $M$
-\end{board}
-\begin{board}
-section 6's network, priced --- $S = \{1,2\}$, $B = 15$, $p = 1$, $h_i = 1$, $u_i = 100$, $o_i = 1$:
-\[
-\begin{aligned}
-  \min\quad & 10 x_1 + 20 x_2 + r_1 + r_2 + 2 y_{13} + y_{23} + 3 y_{34} + 4 y_{14}
-    + 100 (q_3 + q_4) + \textstyle\sum_i s_i \\
-  \text{s.t.}\quad
-    & -y_{13} - y_{14} + r_1 + q_1 - s_1 = 0 && \text{[node 1]} \\
-    & -y_{23} + r_2 + q_2 - s_2 = 0 && \text{[node 2]} \\
-    & y_{13} + y_{23} - y_{34} + q_3 - s_3 = 5 && \text{[node 3]} \\
-    & y_{34} + y_{14} + q_4 - s_4 = 8 && \text{[node 4]} \\
-    & r_1 + r_2 \le 15, \qquad r_1 \le 15 x_1, \qquad r_2 \le 15 x_2, \qquad x_1 + x_2 \le 1 \\
-    & y, r, s \ge 0, \quad q_1 = q_2 = 0, \quad 0 \le q_3 \le 5, \quad 0 \le q_4 \le 8, \quad x_1, x_2 \in \{0,1\}
-\end{aligned}
-\]
-sixteen variables, two binary ($q_1 = q_2 = 0$ since $d_1 = d_2 = 0$, so fourteen move). \ at $p = 1$, two plans:
-\begin{center}
-\begin{tabular}{@{}l|c|c|l|c@{}}
- plan & open & hold & ship & total \\ \hline
- $x_2 = 1$: \ $r_2 = 13$, \ $y_{23} = 13$, \ $y_{34} = 8$ & $20$ & $13$ & $1 \cdot 13 + 3 \cdot 8 = 37$ & $70$ \\[2pt]
- $x_1 = 1$: \ $r_1 = 13$, \ $y_{13} = 5$, \ $y_{14} = 8$ & $10$ & $13$ & $2 \cdot 5 + 4 \cdot 8 = 42$ & $\mathbf{65}$ \\
-\end{tabular}
-\end{center}
-site 2 ships cheaper and still loses: $-5$ on the road, $+10$ at the door
-\vspace{1pt}
-
-\quad $f_1 = 15$ $\Rightarrow$ tie at 70; \ past that, or arc $(1,4)$ flooded (site 1: $10 + 13 + 50 = 73$), site 2 wins
-\vspace{2pt}
-
-\quad \textbf{a cost paid once against a cost paid per ton --- that trade is the LAP}
-\vspace{3pt}
-
-\textbf{and the LP lies, as section 7 warned:}
-\[
-  z_{\mathrm{LP}} = 62 \ \ < \ \ z_{\mathrm{IP}} = 65,
-  \qquad x_1 = \tfrac{8}{15}, \ \ x_2 = \tfrac13, \ \ r_1 = 8, \ \ r_2 = 5
-\]
-\quad half-open depots: open for $10 \cdot \tfrac{8}{15} + 20 \cdot \tfrac13 = 12$, hold 13, ship 37 --- site 2's road bill
-without site 2's door $\Rightarrow$ 62. \ section 1's gap, on our own toy
-\end{board}
-\demo{lap\_app.py}{the model on a map --- drag \texttt{training data} to 1 and the dashboard collapses to today's single-scenario model (above 1 it is week 9's). \texttt{max facilities} is $p$; prices are \texttt{budget B} $= B$, \texttt{facility cost c} $= f_i$, \texttt{reserve cost f} $= h_i$ --- the app's letters do not match ours. \emph{Solve} picks the plan, \emph{Simulate disaster} routes it.}
-\takeaway{LAP $=$ MCNF $+$ two decisions MCNF cannot make: \emph{which} nodes supply ($x_i$) and \emph{how much} ($r_i$). fix those and a flow problem is all that is left --- TU, easy. all the hardness is in $(x,r)$.}
-
-% ---------------------------------------------------------------- 9
-\beat{9}{The assumption we just made}
-\begin{board}
-$d_i$ on the right-hand side, \emph{known} --- when $x_i, r_i$ are chosen. \ nobody knows where the earthquake will be
-\vspace{3pt}
-
-\begin{center}
-\begin{tabular}{@{}l|c|l@{}}
- \textbf{stage 1: now} & \emph{$\longrightarrow$ \ the disaster \ $\longrightarrow$} & \textbf{stage 2: then} \\ \hline
- open depots, place stock & demand $d$ reveals itself & route what you have \\[2pt]
- $x_i$, \ $r_i$ & & $y_{ij}$, \ $q_i$, \ $s_i$ \\[2pt]
- committed, binary, expensive & & reactive, a flow problem, easy \\
-\end{tabular}
-\end{center}
-\vspace{2pt}
-
-the split is already \emph{in the variables} --- re-read the model, do not rebuild it. \ worst case or average? --- week 9
-\end{board}
-\key{\emph{ML predicts; optimization decides} --- a forecast of $d$ is an input, not an answer.}
 
 % ---------------------------------------------------------------- next
 \enlargethispage{3\baselineskip}
 \par\medskip
 {\color{ruleink}\rule{\textwidth}{1.2pt}}\par\nobreak\vspace{3pt}
-{\color{keyink}\small\textbf{next lecture}\quad is $r_i \le B x_i$ the \emph{best} way to write that row? other formulations
-describe the same plans and return the same answer --- and one solves in seconds where another runs all night.
-\ \textbf{Homework 2 is out} (due 10/6).}
+{\color{keyink}\small\textbf{next lecture}\quad the LAP: MCNF where the supplies $b_i$ are \emph{chosen}, not given ---
+which facilities open, how much each holds --- and the LP relaxation starts to lie. then: is $y_{ij} \le M x_i$ the \emph{best}
+way to write a linking row? other formulations describe the same plans and return the same answer --- and one solves in
+seconds where another runs all night. \ \textbf{Homework 2 is out} (due 10/6).}
 
 \end{document}
