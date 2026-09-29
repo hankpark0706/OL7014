@@ -1,0 +1,81 @@
+﻿% ============================================================================
+% Conference report template -- week 11 deliverable (report due 11/17).
+% One page. The point: look at one presentation through the optimization
+% lens (not necessarily IP) and describe its problem IN WORDS -- decision
+% variables, objective, constraints, data -- then judge the model.
+% Self-contained -- compiles with pdflatex.
+% ============================================================================
+\documentclass[10pt]{article}
+
+\usepackage[a4paper, margin=2.2cm]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+
+\definecolor{ruleink}{RGB}{18, 68, 140}
+\definecolor{keyink}{RGB}{20, 90, 20}
+\definecolor{hintink}{RGB}{110, 110, 110}
+
+\setlength{\parindent}{0pt}
+\pagestyle{empty}
+
+% ---- one section -----------------------------------------------------------
+\newcommand{\repsec}[1]{%
+  \par\smallskip
+  {\color{ruleink}\rule{\textwidth}{1pt}}\par\nobreak\vspace{3pt}
+  {\bfseries #1}\par\nobreak\vspace{3pt}}
+\newcommand{\hint}[1]{{\color{hintink}\small\itshape #1}\par\vspace{2pt}}
+\newcommand{\blank}[1]{\vspace{#1}}
+
+\begin{document}
+
+\begin{center}
+  {\large OL7014 Integer Programming}\\[3pt]
+  {\Large\bfseries Conference Report --- Understanding a Talk Through the Optimization Lens}\\[4pt]
+  {\small \textbf{Due Nov 17, start of class}}
+\end{center}
+\medskip\hrule\medskip
+
+Pick \textbf{one} talk and describe its problem as an optimization model, in plain sentences
+(Korean or English) --- no math required. \textbf{One page.} Submit one PDF to \texttt{lossof0706@gmail.com}.
+
+\repsec{1. \ The talk \hfill \normalfont\small 2--3 sentences}
+\hint{Title, speaker, session. Who are the decision makers? What problem are they trying
+to solve, and for whom? Why does it matter?}
+\blank{3.6em}
+
+\repsec{2. \ The problem as an optimization model \hfill \normalfont\small the core of the report}
+
+\textbf{We decide} \dotfill
+\hint{the decision variables --- what gets committed? Which decisions are yes/no (binary),
+which are counts (integer), which are amounts (continuous)?}
+\blank{2.4em}
+
+\textbf{to minimize / maximize} \dotfill
+\hint{the objective --- the one number being improved. If the talk mixes several goals,
+pick the one you would optimize and say what happens to the others.}
+\blank{2.4em}
+
+\textbf{subject to} \dotfill
+\hint{the constraints --- what limits the decisions? budget or capacity,
+logic (if this, then that), rules and policy, physics of the system.
+Two to four constraints, each one sentence.}
+\blank{3.6em}
+
+\textbf{from the data} \dotfill
+\hint{what must be known before the model can be written down --- costs, demands, distances,
+a network?}
+\blank{2.4em}
+
+\repsec{3. \ Analysis \hfill \normalfont\small 4--6 sentences}
+\hint{Is their problem genuinely challenging from an optimization perspective --- and what
+makes it so (discrete decisions, scale, uncertainty, competing objectives)? Do you see a
+mismatch between their actual problem and the optimization model they propose, and how
+would you improve their approach? Do they consider deterministic data that should have
+been random --- would you consider stochastic data instead? Is there a place where sharper
+modeling --- integer decisions, an explicit objective --- would beat their solution?}
+\blank{5.2em}
+
+\end{document}
