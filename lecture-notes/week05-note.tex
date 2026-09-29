@@ -347,30 +347,36 @@ $\det \left(\begin{smallmatrix} 1 & 1 \\ -1 & 1\end{smallmatrix}\right) = 2$ $\R
 2. TU belongs to the \emph{whole} matrix: neither row of $(P_1)$ is guilty alone
 \vspace{3pt}
 
-\textbf{checklist} (sufficient, not necessary) --- nobody checks determinants:
+\textbf{checklist} (sufficient, not necessary):
 \begin{center}
 \begin{tabular}{@{}l|l@{}}
  (i) & every entry is $0, \pm 1$ \\[2pt]
  (ii) & every column has at most two nonzeros \\[2pt]
- (iii) & rows split into $M_1, M_2$ so that \textbf{in every column with two nonzeros} \\
-       & the $M_1$ entries and the $M_2$ entries sum to the same thing \\
+ (iii) & rows split into two sets $(M_1, M_2)$, \ $M_2 = \emptyset$ allowed, so that \textbf{every column $j$ with two nonzeros balances:} \\
+       & \qquad $\displaystyle\sum_{i \in M_1} a_{ij} \;=\; \sum_{i \in M_2} a_{ij}$ \\
 \end{tabular}
 \end{center}
 \vspace{2pt}
 
-\textbf{Prop.} \ two shapes always pass the checklist --- so they are TU:
-\vspace{1pt}
+\begin{center}
+\begin{tabular}{@{}c@{\quad}c@{\quad}c@{\quad}c@{\quad}c@{}}
+ $\left(\begin{smallmatrix} 1 & 1 & 0 & 0 \\ 0 & 0 & 1 & 1 \\ 1 & 0 & 1 & 0 \\ 0 & 1 & 0 & 1 \end{smallmatrix}\right)$ &
+ $\left(\begin{smallmatrix} 1 & 1 & 1 & 0 & 0 & 0 \\ 0 & 0 & 0 & 1 & 1 & 1 \\ 1 & 0 & 0 & 1 & 0 & 0 \\ 0 & 1 & 0 & 0 & 1 & 0 \\ 0 & 0 & 1 & 0 & 0 & 1 \end{smallmatrix}\right)$ &
+ $\left(\begin{smallmatrix} +1 & +1 & 0 \\ -1 & 0 & +1 \\ 0 & -1 & -1 \end{smallmatrix}\right)$ &
+ $\left(\begin{smallmatrix} 1 & 1 & 0 \\ 1 & 0 & 0 \\ 0 & 1 & 1 \end{smallmatrix}\right)$ &
+ $\left(\begin{smallmatrix} 1 & 1 & 0 \\ 0 & 1 & 1 \\ 1 & 0 & 1 \end{smallmatrix}\right)$ \\[5pt]
+ \textbf{TU} --- assignment (\S 2) & \textbf{TU} --- transportation (\S 3) & \textbf{TU} --- MCNF (\S 7) & \textbf{TU} & \textbf{not TU} \ (\S 4) \\[1pt]
+ {\scriptsize\shortstack{$M_1 =$ cadet rows\\[-1pt] $M_2 =$ branch rows}} &
+ {\scriptsize\shortstack{$M_1 =$ facility rows\\[-1pt] $M_2 =$ division rows}} &
+ {\scriptsize\shortstack{$M_1 =$ all rows, $M_2 = \emptyset$\\[-1pt] $(+1) + (-1) = 0$}} &
+ {\scriptsize\shortstack{$M_1 =$ row 1, $M_2 =$ rows 2, 3\\[-1pt] col.~3 exempt: one nonzero}} &
+ {\scriptsize\shortstack{no split:\\[-1pt] an odd cycle}} \\
+\end{tabular}
+\end{center}
+\vspace{2pt}
 
-\quad (a) every column holds one $+1$ and one $-1$ \quad --- (iii) with $M_1 =$ all rows, $M_2 = \emptyset$
-\vspace{1pt}
-
-\quad (b) rows in two blocks, every column holds one $1$ in each block \quad --- (iii) with $M_1 =$ top block, $M_2 =$ bottom
-\vspace{1pt}
-
-\quad two ones per column with no such blocks can fail: section 4's $3 \times 3$ has $\det = 2$
-\vspace{1pt}
-
-\quad $\Rightarrow$ assignment and transportation are shape (b), cadet/facility rows on top: \textbf{solve them as LPs}
+$\Rightarrow$ their matrices are TU, so for integer $b$ Hoffman--Kruskal (\S 4) applies:
+\textbf{assignment and transportation solve as LPs}
 \end{board}
 
 % ---------------------------------------------------------------- 6
@@ -548,7 +554,8 @@ $V = L \cup R$, \ $L \cap R = \emptyset$, \ every arc joins $L$ to $R$ --- none 
 \end{tikzpicture}
 \end{center}
 \begin{board}
-\textbf{$A$ is TU} --- every column holds one $+1$ (tail) and one $-1$ (head): shape (a) of section 5's Prop
+\textbf{$A$ is TU} --- every column holds one $+1$ (tail) and one $-1$ (head): section 5's MCNF example,
+$M_1 =$ all rows, $M_2 = \emptyset$
 \vspace{1pt}
 
 \quad \textbf{$\left(\begin{smallmatrix} A \\ I \end{smallmatrix}\right)$ is TU} --- section 4's Prop (TU-preserving): the capacity rows are $I$,
@@ -581,72 +588,13 @@ sections 2 and 3 were the same model twice --- both bipartite networks, the case
 \key{recognize an IP as a network and it is solved: one row per node, one column per arc, $\pm 1$ entries --- TU by construction, so the relaxation is free.}
 
 % ---------------------------------------------------------------- 8
-\beat{8}{Facility location --- paying to open}
-\begin{board}
-transportation assumed the facilities existed --- \emph{which facilities should exist?}
-\vspace{2pt}
-
-\emph{watch the letters:} back to week 2's convention --- $x$ = integer (open or not), $y$ = continuous.
-relief tons are divisible, so the flow is no longer the integer decision
-\vspace{2pt}
-
-$x_i = 1$ iff facility $i$ opens, \ $f_i$ = fixed opening cost, \ $y_{ij}$ = tons shipped
-\[
-\begin{aligned}
-  \min_{x,\,y}\quad & \textstyle\sum_{i} f_i x_i \;+\; \sum_{i} \sum_{j} c_{ij} y_{ij}
-    && \text{fixed $+$ shipping} \\
-  \text{s.t.}\quad
-    & \textstyle\sum_{i} y_{ij} = d_j && \text{(demand)} \\
-    & y_{ij} \le M x_i && \textbf{(linking --- week 2)} \\
-    & y_{ij} \ge 0, \quad x_i \in \{0,1\}
-\end{aligned}
-\]
-$x_i = 0 \Rightarrow y_{ij} = 0$; \ $x_i = 1$ releases it --- \emph{un}capacitated
-\end{board}
-\begin{center}
-\begin{tikzpicture}[scale=0.8, font=\tiny, >=stealth,
-    sw/.style={draw, rounded corners=1.5pt, inner sep=1.5pt, fill=white}]
-  % facility A: switch on
-  \node[circle, draw, fill=green!15, inner sep=1.4pt, minimum size=4mm] (sA) at (0,2.55) {A};
-  \node[anchor=east, align=right] at (-0.35,2.55) {Facility A\\ $f_A = 10$};
-  \node[sw, draw=green!50!black, text=green!50!black, font=\tiny\bfseries] at (0,3.2) {$x_A = 1$ \ on};
-  % facility B: switch off --- node and roads fade
-  \node[circle, draw, dashed, gray!70, fill=gray!8, text=gray!70, inner sep=1.4pt, minimum size=4mm] (sB) at (0,0.85) {B};
-  \node[anchor=east, align=right, gray!70] at (-0.35,0.85) {Facility B\\ $f_B = 20$};
-  \node[sw, draw=gray!70, text=gray!70, font=\tiny\bfseries] at (0,0.2) {$x_B = 0$ \ off};
-  \foreach \j/\y/\dem in {1/3.4/6, 2/1.7/2, 3/0.0/4} {
-    \node[circle, draw, fill=red!12, inner sep=1.4pt, minimum size=4mm] (d\j) at (5.6,\y) {$\j$};
-    \node[anchor=west, align=left] at (5.95,\y) {Div \j\\ demand \dem};}
-  \foreach \j in {1,2,3} { \draw[->, thick, blue!65!black] (sA) -- (d\j); }
-  \foreach \j in {1,2,3} { \draw[->, dashed, gray!55] (sB) -- (d\j); }
-  \foreach \j/\p in {1/0.55, 2/0.35, 3/0.7}
-    \path (sA) -- node[pos=\p, fill=white, inner sep=0.8pt, text=blue!65!black] {$y_{A\j} \le M$} (d\j);
-  \foreach \j/\p in {1/0.72, 2/0.35, 3/0.55}
-    \path (sB) -- node[pos=\p, fill=white, inner sep=0.8pt, text=gray!70] {$y_{B\j} \le 0$} (d\j);
-  \node[align=center] at (2.8,-0.95) {section 3's graph, nothing added but a \textbf{switch} $x_i \in \{0,1\}$ on each facility, price $f_i$\\
-    B off $\Rightarrow$ $y_{Bj} \le M \cdot 0$: its three roads carry nothing --- the linking row \emph{is} the switch};
-\end{tikzpicture}
-\end{center}
-\begin{board}
-\emph{how big is $M$?} \ $y_{ij} \le d_j$ always $\Rightarrow$ $M = d_j$, smallest valid. \
-$M = \sum_j d_j$: also valid, but looser --- the LP bound sags with it (week 2: the \emph{smallest} valid $M$)
-\vspace{3pt}
-
-\textbf{1. fix $x$} $\Rightarrow$ transportation falls out: \emph{all the hardness is in the binaries}
-\vspace{2pt}
-
-\textbf{2. big-$M$ costs the guarantee:} $y_{ij} \le M x_i$ belongs to no incidence matrix $\Rightarrow$ MCNF's proposition is
-gone. \ (not TU $\ne$ the LP lies: only \emph{some} $b$ must go fractional. week 6 checks)
-\end{board}
-\key{every guarantee in this note is a property of $A$ --- so every one is a single modeling decision away from being lost.}
-
 % ---------------------------------------------------------------- next
 \enlargethispage{3\baselineskip}
 \par\medskip
 {\color{ruleink}\rule{\textwidth}{1.2pt}}\par\nobreak\vspace{3pt}
-{\color{keyink}\small\textbf{next lecture}\quad the LAP: MCNF where the supplies $b_i$ are \emph{chosen}, not given ---
-which facilities open, how much each holds --- and the LP relaxation starts to lie. then: is $y_{ij} \le M x_i$ the \emph{best}
-way to write a linking row? other formulations describe the same plans and return the same answer --- and one solves in
-seconds where another runs all night. \ \textbf{Homework 2 is out} (due 10/6).}
+{\color{keyink}\small\textbf{next lecture}\quad facility location: transportation with a \emph{switch} $x_i \in \{0,1\}$
+on each facility, price $f_i$ --- which facilities should exist? then the LAP: MCNF where the supplies $b_i$ are
+\emph{chosen}, not given --- which facilities open, how much each holds --- and the LP relaxation starts to lie.
+\ \textbf{Homework 2 is out} (due 10/13).}
 
 \end{document}
