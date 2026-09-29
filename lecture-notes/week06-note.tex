@@ -129,18 +129,21 @@ Remember week 5's conservation row (MCNF)? \ the flow is now called $y$ --- noth
 \]
 \emph{what is $b_i$ at a node?} \ stock placed there, minus demand --- and two slacks so the row can always balance:
 \[
-  b_i \;=\; \underbrace{r_i}_{\text{decision}} \;-\; \underbrace{d_i}_{\text{data}} \;+\; q_i \;-\; s_i
+  b_i \;=\; \underbrace{r_i}_{\text{decision}} \;-\; \underbrace{d_i}_{\text{data}}
+  \;+\; \underbrace{q_i}_{\text{unmet demand}} \;-\; \underbrace{s_i}_{\text{surplus}}
 \]
-$r_i \ge 0$ = reserve held at $i$ (cost $h_i$/ton), \quad $q_i \ge 0$ = unmet demand (penalty $u_i$), \quad
-$s_i \ge 0$ = surplus (penalty $o_i$; not transportation's supply)
-\vspace{1pt}
-
-two scalars of \emph{data}: \ $B$ = the stock budget (tons available to preposition), \quad $p$ = the most facilities we may open
+$B$ = the stock budget (tons available to preposition), \quad $p$ = the most facilities we may open
+\[
+  \min_{x,\,r,\,y,\,q,\,s}\quad
+  \underbrace{\textstyle\sum_{i \in V} f_i x_i}_{\text{opening cost}}
+  + \underbrace{\textstyle\sum_{i \in V} h_i r_i}_{\text{stock cost}}
+  + \underbrace{\textstyle\sum_{(i,j) \in E} c_{ij} y_{ij}}_{\text{transportation cost}}
+  + \underbrace{\textstyle\sum_{i \in V} u_i q_i}_{\text{unmet demand cost}}
+  + \underbrace{\textstyle\sum_{i \in V} o_i s_i}_{\text{surplus cost}}
+\]
+\vspace{-2pt}
 \[
 \begin{aligned}
-  \min_{x,\,r,\,y,\,q,\,s}\quad
-    & \textstyle\sum_{i \in V} f_i x_i + \sum_{i \in V} h_i r_i + \sum_{(i,j) \in E} c_{ij} y_{ij}
-      + \sum_{i \in V} u_i q_i + \sum_{i \in V} o_i s_i \\
   \text{s.t.}\quad
     & \textstyle\sum_{j} y_{ij} - \sum_{j} y_{ji} = r_i - d_i + q_i - s_i && (\forall i \in V) && \text{[MCNF's conservation]} \\
     & \textstyle\sum_{i \in V} r_i \le B && && \text{[budget: a knapsack row]} \\
@@ -149,7 +152,6 @@ two scalars of \emph{data}: \ $B$ = the stock budget (tons available to preposit
     & y, r, s \ge 0, \quad 0 \le q_i \le d_i, \quad x_i \in \{0,1\}
 \end{aligned}
 \]
-five costs: open ($f_i$), hold ($h_i$), ship ($c_{ij}$), unmet demand penalty ($u_i$), surplus maintenance cost ($o_i$). \ every constraint is old
 \end{board}
 
 \par\medskip\needspace{6\baselineskip}
