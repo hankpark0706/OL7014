@@ -23,7 +23,7 @@ demos, and Colab-ready notebooks, updated weekly as the course progresses.
 | 4 | 9/18 | ML is optimization; classification as MILP | [week04](lecture-notes/week04-slide.pdf) | | | [TensorFlow Playground](https://playground.tensorflow.org/#activation=tanh&batchSize=10&dataset=circle&regDataset=reg-plane&learningRate=0.03&regularizationRate=0&noise=0&networkShape=4,2&seed=0.11962&showTestData=false&discretize=false&percTrainData=50&x=true&y=true&xTimesY=false&xSquared=false&ySquared=false&cosX=false&sinX=false&cosY=false&sinY=false&collectStats=false&problem=classification&initZero=false&hideText=false) |
 | 5 | 9/22 | Classic IP models; network problems | [week05](lecture-notes/week05-note.pdf) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/hankpark0706/OL7014/blob/main/notebooks/week5_transportation.ipynb) | | **[HW#2](homework/hw02.pdf) out** (due 10/13) |
 | 6 | 9/29 | Deterministic location–allocation problem (LAP) | [week06](lecture-notes/week06-note.pdf) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/hankpark0706/OL7014/blob/main/notebooks/week6_lap.ipynb) | | |
-| 7 | 10/6 | Alternative formulations; branch-and-bound | | | | |
+| 7 | 10/6 | Alternative formulations; branch-and-bound | | | 1. [Branch and bound in 3 mins](https://youtube.com/shorts/9-mG47YD61Q?si=RJ9YEXIhpd8nitPj)<br>2. [Branch and bound (full video)](https://www.youtube.com/watch?v=uCmGDXuEQic) | |
 | 8 | 10/13 | **Project topic pitch**; midterm review | | | | Oral presentation · **HW#2 due** |
 | 9 | 10/20 | **Midterm** | | | | Written exam |
 | 10 | 10/27 | Two-stage sample average approximation; data-driven two-stage LAP 1 | | | | |
