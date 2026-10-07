@@ -26,9 +26,9 @@ demos, and Colab-ready notebooks, updated weekly as the course progresses.
 | 7 | 10/6 | Alternative formulations; branch-and-bound | [week07](lecture-notes/week07-note.pdf) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/hankpark0706/OL7014/blob/main/notebooks/week6_lap.ipynb) | 1. [Branch and bound in 3 mins](https://youtube.com/shorts/9-mG47YD61Q?si=RJ9YEXIhpd8nitPj)<br>2. [Branch and bound (full video)](https://www.youtube.com/watch?v=uCmGDXuEQic) | |
 | 8 | 10/13 | midterm review  | 
 | 9 | 10/20 | **Midterm** | | | | Written exam |
-| 10 | 10/27 | **Project topic pitch**; Two-stage sample average approximation; data-driven two-stage LAP 1 | [Project pitch template](final-project/OL7014_project_template.pdf) || | | | || Oral presentation · **HW#2 due** |
+| 10 | 10/27 | **Project topic pitch**| [Project pitch template](final-project/OL7014_project_template.pdf) || | | | || Oral presentation · **HW#2 due** |
 | 11 | 11/3 | Conference attendance — analyze one presentation from an optimization perspective | | | | **[Report](homework/conference-report.docx)**<br>(due 11/17) |
-| 12 | 11/10 | Data-driven two-stage LAP 2 | | | | **project draft due** (written) |
+| 12 | 11/10 | Data-driven two-stage LAP | | | | **project draft due** (written) |
 | 13 | 11/17 | Evaluation and scalability — out-of-sample evaluation, VSS, sample size | | | | |
 | 14 | 11/24 | Benders decomposition | | | | |
 | 15 | 12/1 | Cutting planes (branch-and-cut) | | | | |
