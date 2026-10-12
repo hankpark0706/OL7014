@@ -1,0 +1,181 @@
+% ============================================================================
+% SUPPLEMENT -- Where the upper bound comes from (companion to week07-note.tex)
+%
+% Written after the week-7 LAP coding session, where the question was: what is
+% the upper bound in the branch & bound demo, and is it a Lagrangian bound?
+% It is not -- it is the LP relaxation of week 7 S1, one per node, reported
+% over the open nodes. Style of week06-note.tex. Self-contained.
+% ============================================================================
+\documentclass[10pt]{article}
+
+\usepackage[a4paper, margin=1.5cm]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{tikz}
+\usepackage{needspace}
+\usepackage{kotex}
+\usepackage[hidelinks]{hyperref}
+
+\definecolor{ruleink}{RGB}{18, 68, 140}
+\definecolor{demoink}{RGB}{140, 82, 20}
+\definecolor{keyink}{RGB}{20, 90, 20}
+\definecolor{watchink}{RGB}{86, 60, 140}
+\definecolor{punchink}{RGB}{170, 30, 60}
+
+\setlength{\parindent}{0pt}
+\pagestyle{empty}
+
+% tighter spacing around centered displays
+\AtBeginDocument{%
+  \abovedisplayskip=4pt plus 1pt
+  \belowdisplayskip=4pt plus 1pt
+  \abovedisplayshortskip=2pt
+  \belowdisplayshortskip=2pt}
+
+% ---- one section -----------------------------------------------------------
+\newcommand{\beat}[2]{%   number, title
+  \par\medskip
+  {\color{ruleink}\rule{\textwidth}{1pt}}\par\nobreak\vspace{2pt}
+  {\large\bfseries #1.\; #2}\par\nobreak\vspace{3pt}}
+
+% ---- board content ---------------------------------------------------------
+\newenvironment{board}{%
+  \par\vspace{2pt}
+  \begingroup\leftskip=1.3em\relax}{%
+  \par\endgroup\vspace{2pt}}
+
+% ---- highlights ------------------------------------------------------------
+\newcommand{\demo}[2]{\par{\leavevmode\color{demoink}\small\textbf{demo}\quad\texttt{#1} --- #2}\par}
+\newcommand{\watch}[1]{\par{\color{watchink}\small\textbf{watch}\quad #1}\par}
+\newcommand{\key}[1]{\par\vspace{1pt}{\color{keyink}\small\textbf{KEY}\quad\textbf{#1}}\par}
+\newcommand{\takeaway}[1]{%
+  \par\vspace{2pt}\noindent
+  {\color{punchink}\rule{2pt}{10pt}}\;{\color{punchink}\small\textbf{takeaway}\quad\textbf{#1}}\par\vspace{2pt}}
+
+\begin{document}
+
+{\Large\bfseries Supplement --- Where the Upper Bound Comes From}\\[2pt]
+{\small OL7014 Integer Programming \quad\textbullet\quad Instructor: Prof.\ H.\ Park
+\quad\textbullet\quad companion to Week 7, \S\S 4--5 \quad\textbullet\quad Oct 12, 2026}
+
+% ---------------------------------------------------------------- 1
+\beat{1}{One relaxation per node --- that is the whole construction}
+\begin{board}
+week 7: node $k$ owns the piece $X_k = P_k \cap \mathbb{Z}^n_{+}$, and $LP_k$ relaxes it. \ \emph{that LP value is the node's bound}
+\[
+  z^k \;=\; \max\{\, c^{\top}x : x \in X_k \,\}
+  \;\;\le\;\;
+  z_{\mathrm{LPR}}(k) \;=\; \max\{\, c^{\top}x : x \in P_k \,\}
+\]
+\[
+  P_k \;=\; P_0 \cap \{\, x_j = v \ : \ (j,v) \text{ fixed on the path down to } k \,\}
+\]
+no second model, no multipliers: \ \textbf{constructing the bound $=$ solving one LP}
+\vspace{3pt}
+
+in the code the LP is built \emph{once}, with the binaries relaxed to $0 \le x_i \le 1$; branching never rebuilds it ---
+it only moves two numbers:
+\[
+  \text{fix } x_j = v \ \text{ on the path} \quad\Longrightarrow\quad \ell_j = u_j = v, \qquad \text{re-solve}
+\]
+\quad each child differs from its parent in one bound, so the simplex restarts warm --- which is why thousands of nodes are
+affordable
+\end{board}
+\key{a bound is a \emph{promise about a region}: $z_{\mathrm{LPR}}(k)$ says ``nothing in $X_k$ can beat this'', and it is cheap because the region is described by bounds alone.}
+
+% ---------------------------------------------------------------- 2
+\beat{2}{The number on the screen --- the best promise still outstanding}
+\begin{board}
+at any moment the tree holds \textbf{closed} nodes (pruned or branched) and \textbf{open} nodes (created, not yet solved)
+\vspace{2pt}
+
+the global upper bound {\footnotesize(상한)} is the best promise over the open nodes --- the best any unexplored region could
+still deliver:
+\[
+  \overline{z} \;=\; \max\Bigl\{\, \underline{z}, \ \max_{k \ \mathrm{open}} \ z_{\mathrm{LPR}}(k) \,\Bigr\}
+  \qquad\qquad
+  \underline{z} \;=\; c^{\top}\hat{x} \ \ \text{(incumbent, the lower bound {\footnotesize(하한)})}
+\]
+\textbf{but an open node has not been solved} --- there is no $z_{\mathrm{LPR}}(k)$ yet. use its \emph{parent's} value:
+\[
+  P_k \subseteq P_{\mathrm{parent}(k)}
+  \qquad\Longrightarrow\qquad
+  z_{\mathrm{LPR}}(k) \;\le\; z_{\mathrm{LPR}}(\mathrm{parent}(k))
+\]
+\quad fixing one more variable can only shrink the region, so the parent's value is a valid --- slightly loose --- stand-in
+\vspace{1pt}
+
+\quad this is exactly what a solver prints as its \texttt{Best Bd} column: a bound over \emph{pending} nodes, not a solved LP
+\vspace{3pt}
+
+\textbf{the gap, and the stop:}
+\[
+  \mathrm{gap} \;=\; \frac{\overline{z} - \underline{z}}{|\underline{z}|}
+  \qquad\qquad
+  \text{open list empty} \ \Rightarrow\ \overline{z} = \underline{z} \ \Rightarrow\ \text{gap } 0 \ \Rightarrow\ \text{proved optimal}
+\]
+\quad $\underline{z}$ only rises (better plans found), $\overline{z}$ only falls (promises expire) --- the two curves close on $z_{\mathrm{IP}}$
+\end{board}
+\key{the upper bound is not one LP. it is the \emph{maximum over the open nodes} --- and it drops only when the node holding it is finally solved.}
+
+% ---------------------------------------------------------------- 3
+\beat{3}{Minimizing? flip the sign once, at the start}
+\begin{board}
+the LAP minimizes cost; week 7 maximizes. the demo flips once --- $z = -\,\text{cost}$, \ $\max z = -\min \text{cost}$ ---
+so every rule above reads unchanged:
+\begin{center}
+\begin{tabular}{@{}l|l|l@{}}
+ & \textbf{min cost} (the model you wrote) & \textbf{max $z = -\text{cost}$} (what the demo solves) \\ \hline
+ relaxation $LP_k$ & \emph{lower} bound on cost & \emph{upper} bound $\overline{z}$ \\[2pt]
+ incumbent $\hat{x}$ & \emph{upper} bound on cost & \emph{lower} bound $\underline{z}$ \\
+\end{tabular}
+\end{center}
+\vspace{2pt}
+
+\quad the relaxation is always the \textbf{optimistic} side (it may cheat), the incumbent always the \textbf{achievable} side
+(someone can execute it)
+\vspace{1pt}
+
+\quad so on screen the blue curve falls and the magenta one rises; on your own min-cost model, read them as a cost floor
+rising and a cost ceiling falling
+\end{board}
+\watch{nothing here is Lagrangian duality. a Lagrangian bound would move the hard rows \emph{into} the objective with
+multipliers $\lambda$ and optimize what is left; this is the LP relaxation of week 7, \S 1 --- same principle (relax, then
+bound), different relaxation. a Lagrangian bound on $r_i \le B x_i$ is a fine project topic, and it is never worse than
+the LP bound.}
+
+% ---------------------------------------------------------------- 4
+\beat{4}{Why the LAP's bound is so weak}
+\begin{board}
+the linking row is $r_i \le B\, x_i$ with $M = B$ (week 6). \ in the relaxation, set
+\[
+  x_i \;=\; \frac{r_i}{B} \;\in\; [0,1]
+\]
+and the reserve is fully unlocked for a \emph{fraction} of the opening cost. the LP opens slivers of every site, the fixed
+costs nearly vanish, and $\overline{z}$ is far too optimistic
+\vspace{2pt}
+
+\quad week 5's two-site toy: \ $z_{\mathrm{LP}} = 62$ against $z_{\mathrm{IP}} = 65$, at $x = (\tfrac{8}{15}, \tfrac13)$
+\vspace{1pt}
+
+\quad at $n = 30$ sites the demo needs roughly $9{,}000$ LPs to close that gap; $n = 50$ runs for minutes
+\vspace{3pt}
+
+two ways to close a gap, and only one of them is the solver's:
+\begin{center}
+\begin{tabular}{@{}l|l|l@{}}
+ from below & branching finds better plans & $\underline{z}$ rises \ --- search \\[2pt]
+ from above & a tighter $P_0$ (week 7, \S 2) & $\overline{z}$ falls \ --- \emph{modeling} \\
+\end{tabular}
+\end{center}
+\vspace{2pt}
+
+\quad that is the whole argument for alternative formulations: you are not buying a better answer, you are buying a better
+\emph{bound}, and the bound is what the search spends its time on
+\end{board}
+\demo{branch\_and\_bound\_lap.py}{the bounds panel is this note: magenta $= \underline{z}$ (incumbent), blue $= \overline{z}$ (best open-node bound), one point per LP solved. \emph{node order} switches the rule that picks the next open node --- depth-first dives (incumbents early, bound falls late), best-bound takes the node holding $\overline{z}$ (bound falls early, incumbents late). the gap target stops the run early, the way a solver's \texttt{MIPGap} does.}
+\takeaway{upper bound $=$ LP relaxation, one per node, maximized over the nodes still open. branching raises the floor; a tighter formulation lowers the ceiling.}
+
+\end{document}
