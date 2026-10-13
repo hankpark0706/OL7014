@@ -93,10 +93,10 @@ b = \begin{pmatrix} 1 \\ 1 \\ 1 \\ 1 \\ 1 \\ 1 \end{pmatrix}
   does this say about the LP relaxation?
 
 \begin{solution}
-(i) every entry is $0$ or $1$; (ii) every column $(i,j)$ is $e_i + e_{3+j}$, exactly two
-nonzeros; (iii) take $M_1 = \{\text{cadet rows}\}$, $M_2 = \{\text{branch rows}\}$ --- each
-column has one $1$ in each block, so both sums are $1$. All three hold, so $A$ is TU: it is
-the incidence matrix of the bipartite graph cadets\,--\,branches.
+(i) every entry is $0$ or $1$; (ii) every column has exactly two nonzeros --- column $(i,j)$
+is $e_i + e_{3+j}$; (iii) take $M_1 = \{1,2,3\}$ (the cadet rows) and $M_2 = \{4,5,6\}$ (the
+branch rows): each column has one $1$ in each block, so both sums are $1$. All three hold,
+so $A$ is TU: it is the incidence matrix of the bipartite graph cadets\,--\,branches.
 
 With $b = \mathbf{1}$ integral, Hoffman--Kruskal gives integral corners, so the LP
 relaxation has an integral optimum --- the LP \emph{is} the IP, and the binaries can be
