@@ -466,10 +466,10 @@ is integral and the dock arc sits at its capacity, $10$.
 (The side-row version happens to return $76$ integral on this data too. That is 2(c)'s point
 again: without the structure you have no promise, only luck.)
 
-\textbf{Lesson:} the same restriction can be written as a row across arcs or as one more
-arc. The row costs you the network structure --- fatally in (d), silently here; the arc keeps
-it, and with it the guarantee for \emph{every} integer capacity you might set. Model limits
-as arcs whenever you can.
+\textbf{Lesson:} as long as every row is still a flow-conservation row, adding nodes and arcs
+does not destroy TU --- the matrix is simply the incidence matrix of a bigger graph --- so the
+LP relaxation is still guaranteed to solve the IP. Adding a \emph{row} across arcs leaves that
+family and takes the guarantee with it; adding an \emph{arc} stays inside it.
 \end{solution}
 \end{parts}
 
