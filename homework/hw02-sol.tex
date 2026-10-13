@@ -545,24 +545,18 @@ IP : z = 56.0  x = {1: 0, 2: 1}   r = {2: 12.0}   y = {(2,4): 12.0, (4,3): 8.0}
 LP : z = 46.0  x = {1: 0.5, 2: 0.25}  r = {1: 8.0, 2: 4.0}  y = {(1,3): 8.0, (2,4): 4.0}
 \end{lstlisting}
 Gap $= 56 - 46 = 10$.
-
-The IP opens South only ($16$), stocks $12$\,t ($12$), ships all $12$ to the village and
-$8$ of it onward to the town: $12 \cdot 1 + 8 \cdot 2 = 28$. Total $16 + 12 + 28 = 56$.
-
-The LP opens \emph{half} of North and a \emph{quarter} of South, which buys the cheapest
-roads from both ($8$\,t town from North at $2$, $4$\,t village from South at $1$) while
-paying only $20 \cdot \tfrac12 + 16 \cdot \tfrac14 = 14$ at the door. That is the big-$M$
-leak: $r_i \le 16 x_i$ lets $x_i = r_i/16$ unlock the stock for a fraction of the opening cost.
-
-Fixing $x = (0,1)$ and re-solving the LP returns $z = 56$ with the integral plan above: with
-$x$ fixed the model is the network of part (b), TU with integer data, so its LP optimum is
-integral. All the fractionality lived in $x$.
 \end{solution}
 
 \item \textbf{(4 pts)} Which variables are stage~1 and which stage~2? Keep the IP's stage-1
   decisions, let the town's demand be $10$\,t, and solve stage~2.
 
 \begin{solution}
+Parts (a)--(c) treated $d$ as known, which in this application it is not: you must choose
+where to build and what to stock \emph{before} the disaster says where the demand will be.
+That is why the LAP is read as a \textbf{two-stage} problem --- commit first, then react once
+$d$ is realized.
+\vspace{2pt}
+
 \textbf{Stage 1} (before the demand is known): $x_i$, $r_i$. \quad
 \textbf{Stage 2} (after): $y_{ij}$, $q_i$, $s_i$.
 
