@@ -483,6 +483,24 @@ $c_{34} = 1$, $c_{43} = 2$; $h_i = 1$, $u_i = 40$, $o_i = 1$, $B = 16$, $p = 1$.
 \item \textbf{(5 pts)} Write the LAP for this instance with numbers.
 
 \begin{solution}
+\begin{center}
+\begin{tikzpicture}[>=stealth, font=\scriptsize, scale=0.92]
+  \node[circle, draw, fill=green!15, minimum size=7mm] (n1) at (0, 1.5) {1};
+  \node[circle, draw, fill=green!15, minimum size=7mm] (n2) at (0,-1.5) {2};
+  \node[circle, draw, fill=red!12,   minimum size=7mm] (n3) at (4.0, 1.5) {3};
+  \node[circle, draw, fill=red!12,   minimum size=7mm] (n4) at (4.0,-1.5) {4};
+  \node[anchor=east] at (-0.45, 1.5) {North base, \ $f_1 = 20$};
+  \node[anchor=east] at (-0.45,-1.5) {South base, \ $f_2 = 16$};
+  \node[anchor=west] at (4.45, 1.5) {town, \ $d_3 = 8$};
+  \node[anchor=west] at (4.45,-1.5) {village, \ $d_4 = 4$};
+  \draw[->] (n1) -- node[above] {$2$} (n3);
+  \draw[->] (n2) -- node[sloped, above, pos=0.6] {$4$} (n3);
+  \draw[->] (n2) -- node[below] {$1$} (n4);
+  \draw[->] (n3) to[bend left=20] node[right] {$1$} (n4);
+  \draw[->] (n4) to[bend left=20] node[left] {$2$} (n3);
+  \node at (2.0,-2.6) {arc labels: shipping cost per ton; \ green nodes may open a depot, red nodes have demand};
+\end{tikzpicture}
+\end{center}
 \[
 \begin{aligned}
   \min\quad & 20 x_1 + 16 x_2 + r_1 + r_2
