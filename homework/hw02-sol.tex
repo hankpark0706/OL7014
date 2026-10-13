@@ -506,31 +506,30 @@ The linking rows $r_i \le 16 x_i$ carry the entry $-16$ (as $r_i - 16x_i \le 0$)
 matrix may only contain $0, \pm 1$.
 
 Therefore, with $x$ fixed, $16 x_i$ is just an integer bound on $r_i$, and the remaining
-constraints are a network. Give the budget row a slack $t \ge 0$ and read it as the
-conservation row of one extra \emph{depot} node $0$ that feeds $r_1$ and $r_2$. Order the
-free variables as
+constraints are a network: the budget row is the conservation row of one extra \emph{depot}
+node $0$ that feeds $r_1$ and $r_2$. Order the free variables as
 \[
-  \mathbf{x} \;=\; (\,r_1,\; r_2,\; t,\; y_{13},\; y_{23},\; y_{24},\; y_{34},\; y_{43},\;
+  \mathbf{x} \;=\; (\,r_1,\; r_2,\; y_{13},\; y_{23},\; y_{24},\; y_{34},\; y_{43},\;
                      q_3,\; q_4,\; s_1,\; s_2,\; s_3,\; s_4\,)^{\top}
 \]
 ($q_1 = q_2 = 0$ because $d_1 = d_2 = 0$). Writing every row as outflow $-$ inflow:
 \[
 \bordermatrix{%
-  & \scriptstyle r_1 & \scriptstyle r_2 & \scriptstyle t & \scriptstyle y_{13}
+  & \scriptstyle r_1 & \scriptstyle r_2 & \scriptstyle y_{13}
   & \scriptstyle y_{23} & \scriptstyle y_{24} & \scriptstyle y_{34} & \scriptstyle y_{43}
   & \scriptstyle q_3 & \scriptstyle q_4 & \scriptstyle s_1 & \scriptstyle s_2
   & \scriptstyle s_3 & \scriptstyle s_4 \cr
- \scriptstyle \text{depot} & +1 & +1 & +1 &  0 &  0 &  0 &  0 &  0 &  0 &  0 &  0 &  0 &  0 &  0 \cr
- \scriptstyle \text{node }1 & -1 &  0 &  0 & +1 &  0 &  0 &  0 &  0 &  0 &  0 & +1 &  0 &  0 &  0 \cr
- \scriptstyle \text{node }2 &  0 & -1 &  0 &  0 & +1 & +1 &  0 &  0 &  0 &  0 &  0 & +1 &  0 &  0 \cr
- \scriptstyle \text{node }3 &  0 &  0 &  0 & -1 & -1 &  0 & +1 & -1 & -1 &  0 &  0 &  0 & +1 &  0 \cr
- \scriptstyle \text{node }4 &  0 &  0 &  0 &  0 &  0 & -1 & -1 & +1 &  0 & -1 &  0 &  0 &  0 & +1 \cr}
+ \scriptstyle \text{depot} & +1 & +1 &  0 &  0 &  0 &  0 &  0 &  0 &  0 &  0 &  0 &  0 &  0 \cr
+ \scriptstyle \text{node }1 & -1 &  0 & +1 &  0 &  0 &  0 &  0 &  0 &  0 & +1 &  0 &  0 &  0 \cr
+ \scriptstyle \text{node }2 &  0 & -1 &  0 & +1 & +1 &  0 &  0 &  0 &  0 &  0 & +1 &  0 &  0 \cr
+ \scriptstyle \text{node }3 &  0 &  0 & -1 & -1 &  0 & +1 & -1 & -1 &  0 &  0 &  0 & +1 &  0 \cr
+ \scriptstyle \text{node }4 &  0 &  0 &  0 &  0 & -1 & -1 & +1 &  0 & -1 &  0 &  0 &  0 & +1 \cr}
 \begin{array}{l}
- \phantom{=\;0} \\
- =\;16 \\ =\;0 \\ =\;0 \\ =\;-8 \\ =\;-4
+ \phantom{\le\;0} \\
+ \le\;16 \\ =\;0 \\ =\;0 \\ =\;-8 \\ =\;-4
 \end{array}
 \]
-with $0 \le r_i \le 16 x_i$, $0 \le q_i \le d_i$, and $y, s, t \ge 0$.
+with $0 \le r_i \le 16 x_i$, $0 \le q_i \le d_i$, and $y, s \ge 0$.
 
 Every column has at most two nonzeros, and every column that has two carries one $+1$ and
 one $-1$ --- a node--arc incidence matrix, hence TU. The right-hand side is integer, so the
