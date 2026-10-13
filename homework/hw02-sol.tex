@@ -243,9 +243,10 @@ $x_1 + x_2 = b_1$ and $x_1 - x_2 = b_2$ give
 $b_1 + b_2$ and $b_1 - b_2$ have the same parity, so both coordinates are integers exactly
 when $b_1 + b_2$ is even. At $b = (7,1)$: $x = (4,3)$, integral.
 
-No. TU is a property of $A$ alone and promises integrality for \emph{every} integer $b$.
-One lucky right-hand side proves nothing --- $b = (6,1)$ on the same matrix returns
-$(3.5, 2.5)$.
+No. TU is a property of $A$ alone --- it has nothing to do with any particular $b$. And the
+implication runs one way only: TU guarantees integral corners, but failing TU never
+guarantees fractional ones. $b = (7,1)$ is simply a lucky right-hand side on a non-TU
+matrix. (That the guarantee really is gone shows at $b = (6,1)$, which returns $(3.5,2.5)$.)
 \end{solution}
 
 \item \textbf{(5 pts)} In Version~I, North's real limit is $7$ battery packs at $2$ per
