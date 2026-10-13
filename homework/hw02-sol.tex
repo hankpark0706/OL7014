@@ -434,6 +434,27 @@ restriction is simply that arc's capacity,
   0 \;\le\; x_{3_{\mathrm{in}} 3_{\mathrm{out}}} \;\le\; 10 ,
 \]
 a bound on one variable rather than a row across several.
+\begin{center}
+\begin{tikzpicture}[>=stealth, font=\scriptsize, scale=0.88]
+  \node[circle, draw, fill=green!15, minimum size=7mm] (n1) at (0,1.5) {1};
+  \node[circle, draw, fill=green!15, minimum size=7mm] (n2) at (0,-1.5) {2};
+  \node[circle, draw, fill=blue!10,  minimum size=8mm] (hi) at (2.7,0) {$3_{\mathrm{in}}$};
+  \node[circle, draw, fill=blue!10,  minimum size=8mm] (ho) at (5.1,0) {$3_{\mathrm{out}}$};
+  \node[circle, draw, fill=red!12,   minimum size=7mm] (n4) at (7.8,1.5) {4};
+  \node[circle, draw, fill=red!12,   minimum size=7mm] (n5) at (7.8,-1.5) {5};
+  \node[anchor=east] at (-0.45,1.5) {Port $+9$}; \node[anchor=east] at (-0.45,-1.5) {Airfield $+5$};
+  \node[anchor=west] at (8.25,1.5) {North $-8$}; \node[anchor=west] at (8.25,-1.5) {South $-6$};
+  \draw[->] (n1) -- node[sloped, above] {$3 \,|\, 8$} (hi);
+  \draw[->] (n2) -- node[sloped, below] {$2 \,|\, 5$} (hi);
+  \draw[->, red!75!black, very thick] (hi) -- node[above] {$0 \,|\, \mathbf{10}$} node[below] {dock} (ho);
+  \draw[->] (ho) -- node[sloped, above] {$2 \,|\, 7$} (n4);
+  \draw[->] (ho) -- node[sloped, below] {$3 \,|\, 6$} (n5);
+  \draw[->] (n1) to[bend left=22] node[above] {$7 \,|\, 4$} (n4);
+  \draw[->] (n2) to[bend right=22] node[below] {$6 \,|\, 3$} (n5);
+  \draw[->] (n4) -- node[right] {$2 \,|\, 3$} (n5);
+  \node at (3.9,-3.3) {everything entering the hub crosses the dock arc, and that arc is capped at $10$};
+\end{tikzpicture}
+\end{center}
 \begin{lstlisting}
 LP: z = 76.0 {(1,3in): 8.0, (1,4): 1.0, (2,3in): 2.0, (2,5): 3.0,
               (3in,3out): 10.0, (3out,4): 7.0, (3out,5): 3.0}
