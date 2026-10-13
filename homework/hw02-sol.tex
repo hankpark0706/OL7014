@@ -278,11 +278,11 @@ $(1,3), (1,4), (2,3), (2,5), (3,4), (3,5), (4,5)$.
   $G = (V,E)$.
 
 \begin{solution}
-\textbf{Minimum cost network flow (MCNF)}: supplies and demands at nodes, costs and
-capacities on arcs, conservation at every node.
-$V = \{1,2,3,4,5\}$, and $E$ holds the seven arcs
-$(1,3)$, $(1,4)$, $(2,3)$, $(2,5)$, $(3,4)$, $(3,5)$, $(4,5)$.
-Balance holds: $9 + 5 - 8 - 6 = 0$.
+\textbf{Minimum cost network flow (MCNF)}.
+\[
+  V = \{1,2,3,4,5\}, \qquad
+  E = \{(1,3), (1,4), (2,3), (2,5), (3,4), (3,5), (4,5)\}
+\]
 \begin{center}
 \begin{tikzpicture}[>=stealth, font=\scriptsize, scale=0.95]
   \node[circle, draw, fill=green!15, minimum size=7mm] (n1) at (0,1.4) {1};
