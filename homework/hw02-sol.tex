@@ -418,11 +418,22 @@ and no longer TU.
   Hub-out joined by a dock road of capacity $10$. Still TU? Solve. Lesson?
 
 \begin{solution}
-Replace node 3 by $3_{\mathrm{in}}$ and $3_{\mathrm{out}}$: arcs $(1,3_{\mathrm{in}})$,
-$(2,3_{\mathrm{in}})$ keep their data, arcs $(3_{\mathrm{out}},4)$,
-$(3_{\mathrm{out}},5)$ keep theirs, and a dock arc
-$(3_{\mathrm{in}}, 3_{\mathrm{out}})$ has cost $0$ and capacity $10$. Both new nodes have
-$b = 0$.
+The restriction is on the hub's inflow:
+\[
+  x_{13} + x_{23} \;\le\; 10 .
+\]
+Written as a row of the matrix it is another (d) --- and column $(1,3)$ would then carry
+three nonzeros, so the checklist no longer applies and the guarantee is gone.
+
+Split node 3 instead. Arcs $(1,3_{\mathrm{in}})$, $(2,3_{\mathrm{in}})$ keep their data,
+arcs $(3_{\mathrm{out}},4)$, $(3_{\mathrm{out}},5)$ keep theirs, and a dock arc
+$(3_{\mathrm{in}}, 3_{\mathrm{out}})$ carries everything through at cost $0$; both new nodes
+have $b = 0$. Now \emph{everything} entering the hub must cross the dock, so the same
+restriction is simply that arc's capacity,
+\[
+  0 \;\le\; x_{3_{\mathrm{in}} 3_{\mathrm{out}}} \;\le\; 10 ,
+\]
+a bound on one variable rather than a row across several.
 \begin{lstlisting}
 LP: z = 76.0 {(1,3in): 8.0, (1,4): 1.0, (2,3in): 2.0, (2,5): 3.0,
               (3in,3out): 10.0, (3out,4): 7.0, (3out,5): 3.0}
@@ -431,10 +442,13 @@ IP: z = 76.0   (identical)
 Still TU --- it is again a node--arc incidence matrix, just of a bigger graph --- so the LP
 is integral and the dock arc sits at its capacity, $10$.
 
-\textbf{Lesson:} the same kind of restriction costs you TU in (d) and costs you nothing
-here. A capacity written as a \emph{side constraint across arcs} destroys the network
-structure; the same capacity written as \emph{one more arc} keeps it. Model limits as arcs
-whenever you can.
+(The side-row version happens to return $76$ integral on this data too. That is 2(c)'s point
+again: without the structure you have no promise, only luck.)
+
+\textbf{Lesson:} the same restriction can be written as a row across arcs or as one more
+arc. The row costs you the network structure --- fatally in (d), silently here; the arc keeps
+it, and with it the guarantee for \emph{every} integer capacity you might set. Model limits
+as arcs whenever you can.
 \end{solution}
 \end{parts}
 
