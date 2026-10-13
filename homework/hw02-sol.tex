@@ -308,24 +308,36 @@ $(1,3), (1,4), (2,3), (2,5), (3,4), (3,5), (4,5)$.
 \item \textbf{(4 pts)} Define $x$; write $A$, $c$, $b$ and their dimensions.
 
 \begin{solution}
-$x_a$ = truckloads on arc $a$, one per arc, in the column order above:
-$x \in \mathbb{R}^{7}$, $c \in \mathbb{R}^{7}$, $b \in \mathbb{R}^{5}$,
-$A \in \mathbb{R}^{5 \times 7}$ the node--arc incidence matrix ($+1$ where the arc leaves,
-$-1$ where it arrives):
+$x_a$ = truckloads on arc $a$, one per arc: $x \in \mathbb{R}^{7}$, $c \in \mathbb{R}^{7}$,
+$b \in \mathbb{R}^{5}$, and $A \in \mathbb{R}^{5 \times 7}$ is the node--arc incidence matrix
+($+1$ where the arc leaves, $-1$ where it arrives). Writing the capacities as rows as well
+stacks $I$ underneath:
 \[
-A = \begin{pmatrix}
-  1 & 1 & 0 & 0 & 0 & 0 & 0 \\
-  0 & 0 & 1 & 1 & 0 & 0 & 0 \\
- -1 & 0 &-1 & 0 & 1 & 1 & 0 \\
-  0 &-1 & 0 & 0 &-1 & 0 & 1 \\
-  0 & 0 & 0 &-1 & 0 &-1 &-1
-\end{pmatrix},
-\quad
-c = \begin{pmatrix} 3\\7\\2\\6\\2\\3\\2 \end{pmatrix},
-\quad
-b = \begin{pmatrix} 9\\5\\0\\-8\\-6 \end{pmatrix},
-\quad 0 \le x \le u .
+\binom{A}{I} \;=\;
+\bordermatrix{%
+  & \scriptstyle (1,3) & \scriptstyle (1,4) & \scriptstyle (2,3) & \scriptstyle (2,5)
+  & \scriptstyle (3,4) & \scriptstyle (3,5) & \scriptstyle (4,5) \cr
+ \scriptstyle \text{node }1 & +1 & +1 &  0 &  0 &  0 &  0 &  0 \cr
+ \scriptstyle \text{node }2 &  0 &  0 & +1 & +1 &  0 &  0 &  0 \cr
+ \scriptstyle \text{node }3 & -1 &  0 & -1 &  0 & +1 & +1 &  0 \cr
+ \scriptstyle \text{node }4 &  0 & -1 &  0 &  0 & -1 &  0 & +1 \cr
+ \scriptstyle \text{node }5 &  0 &  0 &  0 & -1 &  0 & -1 & -1 \cr
+ \noalign{\vskip3pt}
+ \scriptstyle \text{cap }(1,3) & 1 & 0 & 0 & 0 & 0 & 0 & 0 \cr
+ \scriptstyle \text{cap }(1,4) & 0 & 1 & 0 & 0 & 0 & 0 & 0 \cr
+ \scriptstyle \text{cap }(2,3) & 0 & 0 & 1 & 0 & 0 & 0 & 0 \cr
+ \scriptstyle \text{cap }(2,5) & 0 & 0 & 0 & 1 & 0 & 0 & 0 \cr
+ \scriptstyle \text{cap }(3,4) & 0 & 0 & 0 & 0 & 1 & 0 & 0 \cr
+ \scriptstyle \text{cap }(3,5) & 0 & 0 & 0 & 0 & 0 & 1 & 0 \cr
+ \scriptstyle \text{cap }(4,5) & 0 & 0 & 0 & 0 & 0 & 0 & 1 \cr}
+\begin{array}{l}
+ \phantom{=\;0} \\
+ =\;9 \\ =\;5 \\ =\;0 \\ =\;-8 \\ =\;-6 \\[3pt]
+ \le\;8 \\ \le\;4 \\ \le\;5 \\ \le\;3 \\ \le\;7 \\ \le\;6 \\ \le\;3
+\end{array}
 \]
+The top five rows are $Ax = b$, the bottom seven $Ix \le u$; the objective is
+$c = (3, 7, 2, 6, 2, 3, 2)^{\top}$.
 \end{solution}
 
 \item \textbf{(4 pts)} Explain why $A$ is TU; solve the relaxation and confirm every flow
