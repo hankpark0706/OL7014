@@ -182,11 +182,11 @@ $1\times1$ submatrices are the entries, all $0, \pm 1$ in both. The $2\times2$:
 \]
 So $A_{\mathrm{I}}$ is \textbf{TU}, $A_{\mathrm{II}}$ is \textbf{not}.
 
-A cap $x_j \le u_j$ is a unit row $e_j^{\top}$. Appending unit rows to a TU matrix keeps it
-TU ($A$ TU $\iff$ $\binom{A}{I}$ TU): any square submatrix either misses the new row, or
-expands along it --- a single $\pm 1$ times a smaller determinant, still $0, \pm 1$. A cap
-restricts \emph{one} variable; only a row that \emph{compares} variables can create a
-determinant of $2$.
+A cap $x_j \le u_j$ is a single unit row $e_j^{\top}$ --- one row of $I$. Appending it keeps
+$A$ TU: in any square submatrix that row has at most one nonzero, so the determinant is
+either $0$ or $\pm 1$ times a smaller determinant of $A$. (Equivalently: $A$ TU $\iff$
+$\binom{A}{I}$ TU, and deleting rows preserves TU.) A cap restricts \emph{one} variable;
+only a row that \emph{compares} variables can create a determinant of $2$.
 \end{solution}
 
 \item \textbf{(6 pts)} Report $z_{\mathrm{LP}}$ and $z_{\mathrm{IP}}$ for each version and
@@ -224,10 +224,10 @@ determinant of $2$.
   \node at (3,-1) {Version II: \ $x_1 - x_2 \le 1$, \ not TU};
 \end{tikzpicture}
 \end{center}
-Both corners solve the same two tight rows, but Cramer divides by $\det A$: with
-$\det A_{\mathrm{I}} = -1$ the corner cannot be fractional, while $\det A_{\mathrm{II}} = -2$
-is a division by $2$ waiting to happen --- and $b = (6,1)$ makes it happen, at the half-integers
-$(3.5, 2.5)$.
+$A_{\mathrm{I}}$ is TU, so with integer $b$ every corner is integral and the LP optimum is
+the IP optimum --- no gap. $A_{\mathrm{II}}$ is not TU, so nothing guarantees an integral
+optimum, and in the figure it is not: the corner where both rows are tight sits at
+$(3.5, 2.5)$. Hence the gap.
 \end{solution}
 
 \item \textbf{(5 pts)} Keep $A_{\mathrm{II}}$ with integer $b = (b_1, b_2)$,
