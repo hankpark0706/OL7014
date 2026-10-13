@@ -505,8 +505,7 @@ $c_{34} = 1$, $c_{43} = 2$; $h_i = 1$, $u_i = 40$, $o_i = 1$, $B = 16$, $p = 1$.
 The linking rows $r_i \le 16 x_i$ carry the entry $-16$ (as $r_i - 16x_i \le 0$). A TU
 matrix may only contain $0, \pm 1$.
 
-Fix $x$. The linking rows become plain bounds ($r_i \le 16$ or $r_i \le 0$) and the
-cardinality row disappears, both of which only bound variables. What remains is the four
+Fix $x$. The linking rows become plain bounds ($r_i \le 16$ or $r_i \le 0$). What remains is the four
 conservation rows plus the budget row, and the budget row $\sum_i r_i \le 16$ is the
 conservation row of one extra ``depot'' node that feeds $r_1$ and $r_2$ --- with a slack it
 is an equality at that node. So the matrix is again a node--arc incidence matrix of a
