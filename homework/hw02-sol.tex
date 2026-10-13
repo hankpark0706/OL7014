@@ -383,9 +383,30 @@ IP: z = 79.0 {(1,3): 5.0, (1,4): 4.0, (2,3): 5.0, (3,4): 4.0, (3,5): 6.0}
 \end{lstlisting}
 Gap $= 79 - 78 = 1$, and the LP ships half truckloads.
 
-Take the node-3 row and the new highway row, in columns $(1,3)$ and $(3,4)$:
+The highway row joins the five node rows (capacity rows omitted); the four boxed entries are
+the damage:
 \[
-  \begin{pmatrix} -1 & 1 \\ 1 & 1 \end{pmatrix},
+\bordermatrix{%
+  & \scriptstyle (1,3) & \scriptstyle (1,4) & \scriptstyle (2,3) & \scriptstyle (2,5)
+  & \scriptstyle (3,4) & \scriptstyle (3,5) & \scriptstyle (4,5) \cr
+ \scriptstyle \text{node }1 & +1 & +1 &  0 &  0 &  0 &  0 &  0 \cr
+ \scriptstyle \text{node }2 &  0 &  0 & +1 & +1 &  0 &  0 &  0 \cr
+ \scriptstyle \text{node }3 & {\color{red!75!black}\boxed{-1}} &  0 & -1 &  0
+   & {\color{red!75!black}\boxed{+1}} & +1 &  0 \cr
+ \scriptstyle \text{node }4 &  0 & -1 &  0 &  0 & -1 &  0 & +1 \cr
+ \scriptstyle \text{node }5 &  0 &  0 &  0 & -1 &  0 & -1 & -1 \cr
+ \noalign{\vskip3pt}
+ \scriptstyle \text{highway} & {\color{red!75!black}\boxed{+1}} & 0 & 0 & 0
+   & {\color{red!75!black}\boxed{+1}} & 0 & 0 \cr}
+\begin{array}{l}
+ \phantom{=\;0} \\
+ =\;9 \\ =\;5 \\ =\;0 \\ =\;-8 \\ =\;-6 \\[3pt]
+ \le\;10
+\end{array}
+\]
+Rows $\{\text{node }3, \text{highway}\}$ against columns $\{(1,3), (3,4)\}$ give
+\[
+  \begin{pmatrix} -1 & +1 \\ +1 & +1 \end{pmatrix},
   \qquad \det = -1 - 1 = -2 .
 \]
 The highway row counts both arcs with $+1$ while node~3 sees one entering and one leaving;
