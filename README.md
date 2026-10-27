@@ -27,9 +27,9 @@ demos, and Colab-ready notebooks, updated weekly as the course progresses.
 | 8 | 10/13 | Midterm review | | | | **[HW2 solution](homework/hw02-sol.pdf)** |
 | 9 | 10/20 | **Midterm** | | | | Written exam |
 | 10 | 10/27 | **Project topic pitch** | [Project pitch template](final-project/OL7014_project_template.pdf) | | | Oral presentation |
-| 11 | 11/3 | Conference attendance — analyze a talk from an optimization perspective | | | | **[Report](homework/conference-report.docx)**<br>(due 11/17) |
-| 12 | 11/10 | Data-driven two-stage LAP | | | | **project draft due** (written) |
-| 13 | 11/17 | Evaluation and scalability — out-of-sample evaluation, VSS, sample size | | | | |
+| 11 | 11/3 | Conference attendance — analyze a talk from an optimization perspective | | | | |
+| 12 | 11/10 | Data-driven two-stage LAP (1) | | | | **Re-pitch** (selected groups, oral) |
+| 13 | 11/17 | Data-driven two-stage LAP (2) — out-of-sample evaluation, VSS, sample size | | | | **Project draft due** (written) |
 | 14 | 11/24 | Benders decomposition | | | | |
 | 15 | 12/1 | Cutting planes (branch-and-cut) | | | | |
 | 16 | 12/8 | **Final project presentation** | | | | Final slides & report due |
