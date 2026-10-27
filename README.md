@@ -28,8 +28,8 @@ demos, and Colab-ready notebooks, updated weekly as the course progresses.
 | 9 | 10/20 | **Midterm** | | | | Written exam |
 | 10 | 10/27 | **Project topic pitch** | [Project pitch template](final-project/OL7014_project_template.pdf) | | | Oral presentation |
 | 11 | 11/3 | Conference attendance — analyze a talk from an optimization perspective | | | | |
-| 12 | 11/10 | **Project topic pitch (2nd round)**<br>Data-driven two-stage LAP (1) | | | | Oral presentation |
-| 13 | 11/17 | Data-driven two-stage LAP (2) — out-of-sample evaluation, VSS, sample size | | | | **Project draft due** (written) |
+| 12 | 11/10 | - Project topic pitch (2nd round)<br>- Data-driven two-stage LAP 1 | | | | Oral presentation |
+| 13 | 11/17 | Data-driven two-stage LAP 2 — out-of-sample evaluation, VSS, sample size | | | | **Project draft due** (written) |
 | 14 | 11/24 | Benders decomposition | | | | |
 | 15 | 12/1 | Cutting planes (branch-and-cut) | | | | |
 | 16 | 12/8 | **Final project presentation** | | | | Final slides & report due |
