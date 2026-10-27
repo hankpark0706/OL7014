@@ -27,7 +27,7 @@ demos, and Colab-ready notebooks, updated weekly as the course progresses.
 | 8 | 10/13 | Midterm review | | | | **[HW2 solution](homework/hw02-sol.pdf)** |
 | 9 | 10/20 | **Midterm** | | | | Written exam |
 | 10 | 10/27 | **Project topic pitch** | [Project pitch template](final-project/OL7014_project_template.pdf) | | | Oral presentation |
-| 11 | 11/3 | Conference attendance | | | | |
+| 11 | 11/3 | Conference attendance | | | | - KNDU-KAIST : 11/3<br>- IAMSEC : 11/4 |
 | 12 | 11/10 | - Project topic pitch (2nd round)<br>- Data-driven two-stage LAP 1 | | | | Oral presentation |
 | 13 | 11/17 | Data-driven two-stage LAP 2 — out-of-sample evaluation, VSS, sample size | | | | **Project draft due** (written) |
 | 14 | 11/24 | Benders decomposition | | | | |
